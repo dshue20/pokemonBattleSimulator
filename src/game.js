@@ -55,7 +55,7 @@ export default class PokemonBattle {
     backPokemon.src = this.src2[this.currentLoopIndex2];
     backPokemon.onload = () => {
       this.frameCount++;
-      if (this.frameCount > 2) {
+      if (this.frameCount > 1) {
         this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         this.drawBackground(this.background);
         let pokemon1 = 'front' + this.player1.party[0];
