@@ -13,7 +13,10 @@ const typeColors = {
     water: '#386ceb',
     grass: '#5ca935',
     poison: '#803380',
-    dragon: '#4c08ef'
+    dragon: '#4c08ef',
+    bug: '#a8b820',
+    fairy: '#F98CFF',
+    steel: '#9797ba'
 };
 
 export default typeColors;

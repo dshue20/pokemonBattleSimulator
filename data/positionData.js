@@ -4,7 +4,7 @@ const positionData = {
 
     textXStart: 520,
 
-    turnDisplayX: 15,
+    turnDisplayX: 30,
     turnDisplayY: 415,
     turnDisplayWidth: 150,
     turnDisplayHeight: 35,

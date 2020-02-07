@@ -17,12 +17,11 @@ export default class Turn {
     }
 
     movesDisplay(){
-        this.ctx.clearRect(positionData['turnDisplayWidth'], positionData['moveYStart'], this.dimensions['width'], positionData['moveHeight'] + 10)
+        this.ctx.clearRect(positionData['turnDisplayWidth'], positionData['moveYStart'], this.dimensions['width'], positionData['moveHeight'] + 50)
         const pokemonMoves = statsAndMovesData[this.pokemon[0]]['moves'];
-        console.log('pokemon moves', pokemonMoves);
-        for (let i=0; i < 4; i++){
+        for (let i=0; i < Object.keys(pokemonMoves).length; i++){
             let typeColor = typeColors[pokemonMoves[Object.keys(pokemonMoves)[i]]['type']]
-            let x = i % 2 === 0 ? positionData['turnDisplayWidth'] + 20 : positionData['turnDisplayWidth'] + 30 + positionData['moveWidth'];
+            let x = i % 2 === 0 ? positionData['turnDisplayWidth'] + 40 : positionData['turnDisplayWidth'] + 50 + positionData['moveWidth'];
             let y = i < 2 ? positionData['moveYStart'] : positionData['moveYStart'] + positionData['moveHeight'] + 10;
             this.ctx.fillStyle = typeColor;
             this.ctx.fillRect(x, y, positionData['moveWidth'], positionData['moveHeight']);
