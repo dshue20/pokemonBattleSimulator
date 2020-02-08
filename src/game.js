@@ -46,11 +46,11 @@ export default class PokemonBattle {
   }
 
   drawBackground(background){
-    this.ctx.drawImage(background, 0, 0, 500, 360);
+    this.ctx.drawImage(background, 0, 0, positionData['backgroundWidth'], positionData['backgroundHeight']);
     this.ctx.fillStyle = "black";
-    this.ctx.fillRect(positionData['textXStart'], 0, 280, 500);
+    this.ctx.fillRect(positionData['textXStart'], 0, positionData['textWidth'], positionData['textHeight']);
     this.ctx.fillStyle = "white";
-    this.ctx.fillRect(positionData['textXStart'] + 1, 1, 278, 498);
+    this.ctx.fillRect(positionData['textXStart'] + 1, 1, positionData['textWidth'] - 2, positionData['textHeight'] - 2);
   }
 
   turnDisplay(){
@@ -114,11 +114,25 @@ export default class PokemonBattle {
     }
   }
 
+  move(){
+    if (this.backPlayer.moved || this.frontPlayer.moved){
+      debugger;
+    };
+  }
+
   play(){
     this.turnDisplay();
     // do stuff if the player switches pokemon
     this.afterPokemonSwitch();
+    this.move();
     this.drawPokemon();
     window.requestAnimationFrame(() => this.play());
   }
+
+  // back player turn display
+  // front player turn display
+  // faster switch
+  // slower switch
+  // faster attack
+  // slower attack
 }

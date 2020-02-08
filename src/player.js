@@ -3,6 +3,8 @@ import pokemonData from '../data/pokemonData';
 export default class Player {
   constructor(){
       this.party = this.randomPokemon();
+      this.switched = false;
+      this.moved = false;
   }
 
   randomPokemon(){
