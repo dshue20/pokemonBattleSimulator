@@ -4,21 +4,31 @@ import typeColors from '../data/typeColors';
 import statsAndMovesData from '../data/statsAndMovesData';
 
 export default class Turn {
-    constructor(canvas, player){
+    constructor(canvas, player, whichPlayer){
         this.ctx = canvas.getContext("2d");
         this.dimensions = { width: canvas.width, height: canvas.height };
         this.player = player;
-        console.log(player.party);
+        this.whichPlayer = whichPlayer;
+        //console.log(player.party);
         this.pokemon = player.party;
         this.xStart = positionData['pokemonXStart'] + positionData['pokemonXMargin'] + positionData['screenX'];
         this.yStart = positionData['pokemonYStart'] + positionData['screenY'];
         this.pokemonMoves = statsAndMovesData[this.pokemon[0]]['moves'];
+        this.turnDisplay();
         this.movesDisplay();
         this.switchDisplay();
     }
 
+    turnDisplay(){
+        this.ctx.clearRect(positionData['turnDisplayX'], positionData['turnDisplayY'] - 30, positionData['turnDisplayWidth'], positionData['turnDisplayHeight'] * 2 + 10);
+        this.ctx.font = "bold 24px Verdana";
+        this.ctx.fillStyle = "black";
+        this.ctx.fillText(this.whichPlayer === 'back' ? "Player 1's" : "Player 2's", positionData['turnDisplayX'], positionData['turnDisplayY']);
+        this.ctx.fillText("Turn!", positionData['turnDisplayX'], positionData['turnDisplayY'] + positionData['turnDisplayHeight']);
+    }
+
     movesDisplay(){
-        this.ctx.clearRect(positionData['turnDisplayWidth'], positionData['moveYStart'], this.dimensions['width'], positionData['moveHeight'] + 50)
+        this.ctx.clearRect(positionData['turnDisplayWidth'] + 20, positionData['moveYStart'], this.dimensions['width'], positionData['moveHeight'] + 50)
         for (let i=0; i < Object.keys(this.pokemonMoves).length; i++){
             let typeColor = typeColors[this.pokemonMoves[Object.keys(this.pokemonMoves)[i]]['type']]
             let x = i % 2 === 0 ? positionData['moveXStart'] : positionData['moveXStart'] + positionData['moveWidth'] + 10;
@@ -36,14 +46,6 @@ export default class Turn {
         this.ctx.textAlign = "start";
         this.ctx.fillStyle = 'black';
         this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 3 + positionData['pokemonXMargin'] * 2, positionData['pokemonHeight'] * 3)
-        // const x = [
-        //     positionData['pokemonXStart'], 
-        //     positionData['pokemonXStart'] + positionData['pokemonXStart2'], 
-        //     positionData['pokemonXStart'] + positionData['pokemonXStart2'] * 2, 
-        //     positionData['pokemonXStart'], 
-        //     positionData['pokemonXStart'] + positionData['pokemonXStart2'], 
-        //     positionData['pokemonXStart'] + positionData['pokemonXStart2'] * 2
-        // ];
         let x = [];
         for (let i = 0; i < 6; i++){
             x.push(positionData['pokemonXStart'] + positionData['pokemonXStart2'] * i);
@@ -51,7 +53,7 @@ export default class Turn {
         for (let counter = 0; counter < 6; counter++){
             const y = positionData['pokemonYStart'];
             this.ctx.fillStyle = "black";
-            //debugger;
+
             this.ctx.fillRect(positionData['pokemonXMargin'] + x[counter], y, positionData['pokemonWidth'], positionData['pokemonHeight']);
             if (counter === 0){
                 this.ctx.fillStyle = stylingData['selectedPokemon']
@@ -71,21 +73,35 @@ export default class Turn {
                 } else {
                     this.ctx.fillText(this.pokemon[counter], positionData['iconXStart'] + x[counter], positionData['iconYStart'] + y);
                 };
+                //debugger;
+                // draw HP bar
                 this.ctx.fillText("HP: ", x[counter] + 20, positionData['hpYStart']);
-                // this.ctx.fillStyle = "green";
-                // this.ctx.beginPath();
-                // this.ctx.ellipse(x[counter] + 32 + positionData['pokemonWidth'] / 2, positionData['pokemonHeight'] + y + 12, positionData['pokemonWidth'] / 2 - 15, 8, 0, 0, 2 * Math.PI);
-                // this.ctx.stroke();
-                // this.ctx.fill();
-                this.ctx.fillStyle = "green";
-                this.ctx.beginPath();
-                this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
-                this.ctx.lineTo(x[counter] + positionData['moveWidth'] - 5, positionData['hpBarYStart']);
-                this.ctx.quadraticCurveTo(x[counter] + positionData['moveWidth'], positionData['hpBarYStart'] + 5, x[counter] + positionData['moveWidth'] - 5, positionData['hpBarYStart'] + 10);
-                this.ctx.lineTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart'] + 10);
-                this.ctx.quadraticCurveTo(x[counter] + positionData['hpBarXMargin'] - 5, positionData['hpBarYStart'] + 5, x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
-                this.ctx.stroke();
-                this.ctx.fill();
+                let percentHp = this.player.currentPokemonStats[this.pokemon[counter]]['hp'] / (statsAndMovesData[this.pokemon[counter]]['hp'] * 2 + 141);
+                let hpX;
+                if (percentHp > 0 && percentHp < 0.25){
+                    hpX = 0.45;
+                    this.ctx.fillStyle = "red";
+                } else if (percentHp >= 0.25 && percentHp < 0.5){
+                    hpX = 0.6;
+                    this.ctx.fillStyle = "yellow";
+                } else if (percentHp >= 0.5 && percentHp < 0.75){
+                    hpX = 0.8;
+                    this.ctx.fillStyle = "green";
+                } else if (percentHp >= 0.75 && percentHp <= 1){
+                    hpX = 1;
+                    this.ctx.fillStyle = "green";
+                }
+                if (percentHp >= 0){
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
+                    this.ctx.lineTo(x[counter] + positionData['moveWidth'] * hpX - 5, positionData['hpBarYStart']);
+                    this.ctx.quadraticCurveTo(x[counter] + positionData['moveWidth'] * hpX, positionData['hpBarYStart'] + 5, x[counter] + positionData['moveWidth'] * hpX - 5, positionData['hpBarYStart'] + 10);
+                    this.ctx.lineTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart'] + 10);
+                    this.ctx.quadraticCurveTo(x[counter] + positionData['hpBarXMargin'] - 5, positionData['hpBarYStart'] + 5, x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
+                    this.ctx.stroke();
+                    this.ctx.fill();
+                }
+                //debugger;
             };
         }
     }
@@ -107,6 +123,7 @@ export default class Turn {
                 // update party order and display again
                 this.player.switched = true;
                 this.player.party = this.pokemon;
+                this.player.waitForSwitch = false;
                 break;
             }
         }
@@ -125,6 +142,6 @@ export default class Turn {
         } else if (e.screenX >= positionData['moveXStart'] + positionData['moveWidth'] + 10 && e.screenY >= positionData['moveClickY'] + positionData['moveHeight'] + 10 && e.screenX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.screenY <= positionData['moveClickY'] + positionData['moveHeight'] + positionData['moveHeight'] * 2 + 10){
             move = this.pokemonMoves[Object.keys(this.pokemonMoves)[3]]
         };
-        this.player.moved = true;
+        this.player.move = move;
     }
 }
