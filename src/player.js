@@ -27,8 +27,6 @@ export default class Player {
       };
       if (!party.includes(pokemon)) party.push(pokemon);
     };
-    party[0] = 'Mewtwo';
-    party[1] = 'Magikarp';
     return party;
   }
 }
