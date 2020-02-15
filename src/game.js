@@ -233,6 +233,7 @@ export default class PokemonBattle {
               this.switchTurn();
             } else {
               this.afterPokemonSwitch();
+              this.messageDisplay();
               this.resetTurn();
               this.currentPlayer = this.player1;
               this.drawOptionsDisplay();
@@ -377,6 +378,7 @@ export default class PokemonBattle {
     this.player2.faint = false;
     this.turnCounter++;
     this.messages["Turn " + this.turnCounter.toString()] = [];
+    this.messageDisplay();
   }
 
   finishTurn(){
