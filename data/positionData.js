@@ -6,7 +6,7 @@ const positionData = {
     backgroundHeight: 360,
 
     textXStart: 520,
-    textWidth: 330,
+    textWidth: 400,
     textHeight: 470,
 
     turnDisplayX: 30,
