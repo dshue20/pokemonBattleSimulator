@@ -106,6 +106,9 @@ export default class PokemonBattle {
 
   messageDisplay(){
     this.ctx.clearRect(positionData['textXStart'] + 2, 2, positionData['textWidth'] - 3, positionData['textHeight'] - 3);
+    while (Object.keys(this.messages).length > 3){
+      delete this.messages["Turn " + (this.turnCounter-3).toString()];
+    }
     let y = 30;
     this.ctx.fillStyle = "black";
     Object.keys(this.messages).forEach(turn => {
@@ -182,6 +185,9 @@ export default class PokemonBattle {
           // draw HP bar
           this.ctx.fillText("HP: ", x[counter] + 20, positionData['hpYStart']);
           let percentHp = this.currentPlayer.party[counter].currentStats['hp'] / (statsAndMovesData[this.currentPlayer.party[counter].name]['hp'] * 2 + 141);
+          console.log(this.currentPlayer.party[counter].name);
+          console.log('percentHP', percentHp);
+          console.log('currentHp', this.currentPlayer.party[counter].currentStats['hp']);
           let hpX;
           if (percentHp > 0 && percentHp < 0.25){
               hpX = 0.45;
@@ -224,21 +230,25 @@ export default class PokemonBattle {
 
   switchHandler(e){
     for (let i=1; i < 6; i++){
-        if (e.screenX >=  this.xStart + positionData['pokemonXStart2'] * i && e.screenX <= this.xStart + positionData['pokemonXStart2'] * i + positionData['moveWidth']){
-            this.currentPlayer.party.unshift(this.currentPlayer.party.splice(i,1)[0]);
-            this.messages["Turn " + this.turnCounter.toString()].push(this.currentPlayer.name + " sent out " + this.currentPlayer.party[0].name + "!");
-            // update party order and display again
-            this.currentPlayer.switched = true;
-            if (!this.currentPlayer.faint){
-              this.switchTurn();
-            } else {
-              this.afterPokemonSwitch();
-              this.messageDisplay();
-              this.resetTurn();
-              this.currentPlayer = this.player1;
-              this.drawOptionsDisplay();
-            }
+      if (e.screenX >=  this.xStart + positionData['pokemonXStart2'] * i && e.screenX <= this.xStart + positionData['pokemonXStart2'] * i + positionData['moveWidth']){
+        if (this.currentPlayer.party[i].currentStats['hp'] > 0){
+          this.currentPlayer.party.unshift(this.currentPlayer.party.splice(i,1)[0]);
+          this.messages["Turn " + this.turnCounter.toString()].push(this.currentPlayer.name + " sent out " + this.currentPlayer.party[0].name + "!");
+          // update party order and display again
+          this.currentPlayer.switched = true;
+          if (!this.currentPlayer.faint){
+            this.switchTurn();
+          } else {
+            this.afterPokemonSwitch();
+            this.messageDisplay();
+            this.resetTurn();
+            this.currentPlayer = this.player1;
+            this.drawOptionsDisplay();
+          }
+        } else {
+          this.drawOptionsDisplay();
         }
+      }
     }
   }
 
@@ -323,6 +333,7 @@ export default class PokemonBattle {
       if (!this.checkFaint(slowerPokemon)){
         this.messages["Turn " + this.turnCounter.toString()].push(slowerPlayer.name + "'s " + slowerPokemon.name + ' used ' + Object.keys(slowerMove)[0] + '!');
         this.calculateDamage(Object.values(slowerMove)[0], slowerPokemon, fasterPokemon);
+        this.checkFaint(fasterPokemon);
       }
     } else if (this.player1.move){
       this.messages["Turn " + this.turnCounter.toString()].push(this.player1.name + "'s " + player1Poke.name + ' used ' + Object.keys(this.player1.move)[0] + '!');
@@ -392,8 +403,12 @@ export default class PokemonBattle {
     let player1Poke = Object.values(this.player1.party).filter(pokemon => pokemon.currentStats['hp'] > 0);
     let player2Poke = Object.values(this.player2.party).filter(pokemon => pokemon.currentStats['hp'] > 0);
     if (player1Poke.length === 0){
+      this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
+      this.messageDisplay();
       return true;
     } else if (player2Poke.length === 0){
+      this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
+      this.messageDisplay();
       return true;
     } else {
       return false;

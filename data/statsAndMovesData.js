@@ -550,7 +550,8 @@ const statsAndMovesData = {
             'Ice Beam': movesData['Ice Beam'],
             'Hidden Power': movesData['Hidden Power Grass'],
             'Psychic': movesData['Psychic']
-        }
+        },
+        types: ['water']
     },
     Psyduck: {
         hp: 50,
