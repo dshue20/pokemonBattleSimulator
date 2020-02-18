@@ -153,7 +153,7 @@ export default class PokemonBattle {
   switchDisplay(){
     this.ctx.textAlign = "start";
     this.ctx.fillStyle = 'black';
-    this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 3 + positionData['pokemonXMargin'] * 2, positionData['pokemonHeight'] * 3)
+    this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 6 + positionData['pokemonXMargin'] * 5, positionData['pokemonHeight'] * 3)
     let x = [];
     for (let i = 0; i < 6; i++){
         x.push(positionData['pokemonXStart'] + positionData['pokemonXStart2'] * i);
@@ -202,6 +202,7 @@ export default class PokemonBattle {
               hpX = 1;
               this.ctx.fillStyle = "green";
           }
+          console.log('hpX', hpX);
           if (percentHp >= 0){
               this.ctx.beginPath();
               this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
