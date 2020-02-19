@@ -12,16 +12,7 @@ export default class PokemonBattle {
     this.dimensions = { width: canvas.width, height: canvas.height };
     this.player1 = new Player();
     this.player2 = new Player();
-    // this.player1 = new Player(prompt("Player 1, please enter your name"));
-    // this.player2 = new Player(prompt("Player 2, please enter your name"));
-    // document.addEventListener("click", e => {
-    //   const audio = document.getElementById("music");
-    //   audio.play();
-    // });
-    // this.instructions = false;
-    // while (!this.instructions){
-    //   this.instructionsDisplay();
-    // }
+    this.setAudio();
     this.currentPlayer = this.player1;
     this.frameCount = 0;
     this.currentLoopIndex1 = 0;
@@ -30,39 +21,61 @@ export default class PokemonBattle {
     this.yStart = positionData['pokemonYStart'] + positionData['screenY'];
     this.turnCounter = 1;
     this.messages = {"Turn 1": []};
-    this.paused = false;
+    this.paused = true;
     this.getAnimationInfo();
     this.background = this.setBackground();
     this.bindEventHandlers();
     this.drawBackground(this.background);
     this.drawTextbox();
-    this.drawPokemon();
     this.drawOptionsDisplay();
+    this.instructionsDisplay();
+    this.drawPokemon();
+  }
+
+  setAudio(){
+    this.audio = document.getElementById("music");
+    let audioNum = Math.floor(Math.random() * 17);
+    if (audioNum > 14) audioNum = 12; // i just really like audio source 12
+    this.audio.src = "audio/audio" + audioNum.toString() + ".mp3";
   }
 
   instructionsDisplay(){
-    // drawing the box
-    this.ctx.fillStyle = "black";
-    this.ctx.fillRect(positionData['instructionXStart'], positionData['instructionYStart'], positionData['instructionWidth'], positionData['instructionHeight']);
-    this.ctx.fillStyle = "#FFFBCE";
-    this.ctx.fillRect(positionData['instructionXStart'] + 4, positionData['instructionYStart'] + 4, positionData['instructionWidth'] - 8, positionData['instructionHeight'] - 8);
+    // draw background
+    let frontPokemon = new Image();
+    frontPokemon.src = this.src1[this.currentLoopIndex1];
+    let backPokemon = new Image();
+    backPokemon.src = this.src2[this.currentLoopIndex2];
+
+    backPokemon.onload = () => {
+      this.drawBackground(this.background);
+      let pokemon1 = 'front' + this.firstPoke1;
+      let pokemon2 = 'back' + this.firstPoke2;
+      this.ctx.drawImage(frontPokemon, pokemonData[pokemon1]['x'], pokemonData[pokemon1]['y'], pokemonData[pokemon1]['width'], pokemonData[pokemon1]['height']);
+      this.ctx.drawImage(backPokemon, pokemonData[pokemon2]['x'], pokemonData[pokemon2]['y'], pokemonData[pokemon2]['width'], pokemonData[pokemon2]['height']);
     
-    // writing the instructions
-    this.ctx.fillStyle = "black";
-    this.ctx.font = "20px Verdana";
-    this.ctx.fillText("X", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 30);
-    this.ctx.font = "bold 20px Verdana";
-    this.ctx.fillText("Instructions", positionData['instructionXStart'] + 130, positionData['instructionYStart'] + 30);
-    this.ctx.font = "14px Verdana";
-    this.ctx.fillText("This Pokemon Battle Simulator randomly generates", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 60);
-    this.ctx.fillText("two teams of six Pokemon.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 80);
-    this.ctx.fillText("Players will take turns selecting moves with", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 110);
-    this.ctx.fillText("which to attack or other Pokemon to switch in.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 130);
-    this.ctx.fillText("Text commentary is shown on the right side.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 160)
-    this.ctx.fillText("A player is declared the winner once all of his", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 190);
-    this.ctx.fillText("or her opponent's Pokemon have fainted!", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 210);
-    this.ctx.fillText("Press the 'X' on the top left corner to close", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 240);
-    this.ctx.fillText("this instructions pane.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 260);
+      // drawing the box
+      this.ctx.fillStyle = "black";
+      this.ctx.fillRect(positionData['instructionXStart'], positionData['instructionYStart'], positionData['instructionWidth'], positionData['instructionHeight']);
+      this.ctx.fillStyle = "#FFFBCE";
+      this.ctx.fillRect(positionData['instructionXStart'] + 4, positionData['instructionYStart'] + 4, positionData['instructionWidth'] - 8, positionData['instructionHeight'] - 8);
+      
+      // writing the instructions
+      this.ctx.fillStyle = "black";
+      this.ctx.font = "20px Verdana";
+      this.ctx.fillText("X", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 30);
+      this.ctx.font = "bold 20px Verdana";
+      this.ctx.fillText("Instructions", positionData['instructionXStart'] + 130, positionData['instructionYStart'] + 30);
+      this.ctx.font = "14px Verdana";
+      this.ctx.fillText("This Pokemon Battle Simulator randomly generates", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 60);
+      this.ctx.fillText("two teams of six Pokemon.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 80);
+      this.ctx.fillText("Players will take turns selecting moves with", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 110);
+      this.ctx.fillText("which to attack or other Pokemon to switch in.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 130);
+      this.ctx.fillText("Text commentary is shown on the right side.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 160)
+      this.ctx.fillText("A player is declared the winner once all of his", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 190);
+      this.ctx.fillText("or her opponent's Pokemon have fainted!", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 210);
+      this.ctx.fillText("Press the 'X' on the top left corner to close", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 240);
+      this.ctx.fillText("this instructions pane.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 260);
+    }
   }
 
   getAnimationInfo(){
@@ -267,12 +280,15 @@ export default class PokemonBattle {
           this.moveHandler(e);
       } else if (e.screenX >= positionData['screenX'] + positionData['textXStart'] && e.screenY >= positionData['screenY'] && e.screenX <= positionData['screenX'] + positionData['textXStart'] + positionData['instructionButtonWidth'] && e.screenY <= positionData['screenY'] + positionData['instructionButtonHeight']){
         this.paused = true;
+        this.audio.pause();
         this.instructionsDisplay();
       } else if (e.screenX >= positionData['xXStart'] && e.screenY >= positionData['xYStart'] && e.screenX <= positionData['xXEnd'] && e.screenY <= positionData['xYEnd']){
         this.paused = false;
         this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         this.drawTextbox();
         this.drawOptionsDisplay();
+        this.audio.volume = 0.1;
+        this.audio.play();
       };
     })
   }
@@ -451,12 +467,13 @@ export default class PokemonBattle {
   checkGameOver(){
     let player1Poke = Object.values(this.player1.party).filter(pokemon => pokemon.currentStats['hp'] > 0);
     let player2Poke = Object.values(this.player2.party).filter(pokemon => pokemon.currentStats['hp'] > 0);
-    if (player1Poke.length === 0){
-      this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
-      this.messageDisplay();
-      return true;
-    } else if (player2Poke.length === 0){
-      this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
+    if (player1Poke.length === 0 || player2Poke.length === 0){
+      if (player1Poke.length === 0){
+        this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
+      } else {
+        this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
+      }
+      this.audio.pause();
       this.messageDisplay();
       return true;
     } else {
