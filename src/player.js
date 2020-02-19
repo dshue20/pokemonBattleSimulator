@@ -23,6 +23,8 @@ export default class Player {
     };
     // party[0] = new Pokemon('Pidgeot');
     // party[0].currentStats['hp'] = 1;
+    // party[1] = new Pokemon('Magikarp');
+    // party[1].currentStats['hp'] = 1;
     return party;
   }
 }

@@ -218,61 +218,61 @@ export default class PokemonBattle {
   switchDisplay(){
     this.ctx.textAlign = "start";
     this.ctx.fillStyle = 'black';
-    this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 6 + positionData['pokemonXMargin'] * 5, positionData['pokemonHeight'] * 3)
     let x = [];
     for (let i = 0; i < 6; i++){
         x.push(positionData['pokemonXStart'] + positionData['pokemonXStart2'] * i);
     };
     for (let counter = 0; counter < 6; counter++){
       const y = positionData['pokemonYStart'];
-      this.ctx.fillStyle = "black";
 
-      this.ctx.fillRect(positionData['pokemonXMargin'] + x[counter], y, positionData['pokemonWidth'], positionData['pokemonHeight']);
-      if (counter === 0){
-          this.ctx.fillStyle = stylingData['selectedPokemon']
-      } else {
-          this.ctx.fillStyle = "white";
-      }
-      this.ctx.fillRect(positionData['pokemonXMargin'] + 1 + x[counter], y+1, positionData['pokemonWidth'] - 2, positionData['pokemonHeight'] - 2);
       // icons are 30x30ish
       let icon = new Image();
       icon.src = "images/icons/" + this.currentPlayer.party[counter].name.toLowerCase() + ".png";
       icon.onload = () => {
-          this.ctx.drawImage(icon, positionData['pokemonXMargin'] + 2 + x[counter], y-5);
-          this.ctx.font = "13px Verdana";
-          this.ctx.fillStyle = "black";
-          if (this.currentPlayer.party[counter].name === "Mrmime"){
-              this.ctx.fillText("Mr. Mime", positionData['iconXStart'] + x[counter], positionData['iconYStart'] + y);
-          } else {
-              this.ctx.fillText(this.currentPlayer.party[counter].name, positionData['iconXStart'] + x[counter], positionData['iconYStart'] + y);
-          };
-          // draw HP bar
-          this.ctx.fillText("HP: ", x[counter] + 20, positionData['hpYStart']);
-          let percentHp = this.currentPlayer.party[counter].currentStats['hp'] / (statsAndMovesData[this.currentPlayer.party[counter].name]['hp'] * 2 + 141);
-          let hpX;
-          if (percentHp > 0 && percentHp < 0.25){
-              hpX = 0.45;
-              this.ctx.fillStyle = "red";
-          } else if (percentHp >= 0.25 && percentHp < 0.5){
-              hpX = 0.6;
-              this.ctx.fillStyle = "yellow";
-          } else if (percentHp >= 0.5 && percentHp < 0.75){
-              hpX = 0.8;
-              this.ctx.fillStyle = "green";
-          } else if (percentHp >= 0.75 && percentHp <= 1){
-              hpX = 1;
-              this.ctx.fillStyle = "green";
-          }
-          if (percentHp >= 0){
-              this.ctx.beginPath();
-              this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
-              this.ctx.lineTo(x[counter] + positionData['moveWidth'] * hpX - 5, positionData['hpBarYStart']);
-              this.ctx.quadraticCurveTo(x[counter] + positionData['moveWidth'] * hpX, positionData['hpBarYStart'] + 5, x[counter] + positionData['moveWidth'] * hpX - 5, positionData['hpBarYStart'] + 10);
-              this.ctx.lineTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart'] + 10);
-              this.ctx.quadraticCurveTo(x[counter] + positionData['hpBarXMargin'] - 5, positionData['hpBarYStart'] + 5, x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
-              this.ctx.stroke();
-              this.ctx.fill();
-          }
+        if (!counter) this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 6 + positionData['pokemonXMargin'] * 5, positionData['pokemonHeight'] * 3);
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(positionData['pokemonXMargin'] + x[counter], y, positionData['pokemonWidth'], positionData['pokemonHeight']);
+        if (counter === 0){
+            this.ctx.fillStyle = stylingData['selectedPokemon']
+        } else {
+            this.ctx.fillStyle = "white";
+        }
+        this.ctx.fillRect(positionData['pokemonXMargin'] + 1 + x[counter], y+1, positionData['pokemonWidth'] - 2, positionData['pokemonHeight'] - 2);
+        this.ctx.drawImage(icon, positionData['pokemonXMargin'] + 2 + x[counter], y-5);
+        this.ctx.font = "13px Verdana";
+        this.ctx.fillStyle = "black";
+        if (this.currentPlayer.party[counter].name === "Mrmime"){
+            this.ctx.fillText("Mr. Mime", positionData['iconXStart'] + x[counter], positionData['iconYStart'] + y);
+        } else {
+            this.ctx.fillText(this.currentPlayer.party[counter].name, positionData['iconXStart'] + x[counter], positionData['iconYStart'] + y);
+        };
+        // draw HP bar
+        this.ctx.fillText("HP: ", x[counter] + 20, positionData['hpYStart']);
+        let percentHp = this.currentPlayer.party[counter].currentStats['hp'] / (statsAndMovesData[this.currentPlayer.party[counter].name]['hp'] * 2 + 141);
+        let hpX;
+        if (percentHp > 0 && percentHp < 0.25){
+            hpX = 0.45;
+            this.ctx.fillStyle = "red";
+        } else if (percentHp >= 0.25 && percentHp < 0.5){
+            hpX = 0.6;
+            this.ctx.fillStyle = "yellow";
+        } else if (percentHp >= 0.5 && percentHp < 0.75){
+            hpX = 0.8;
+            this.ctx.fillStyle = "green";
+        } else if (percentHp >= 0.75 && percentHp <= 1){
+            hpX = 1;
+            this.ctx.fillStyle = "green";
+        }
+        if (percentHp >= 0){
+            this.ctx.beginPath();
+            this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
+            this.ctx.lineTo(x[counter] + positionData['moveWidth'] * hpX - 5, positionData['hpBarYStart']);
+            this.ctx.quadraticCurveTo(x[counter] + positionData['moveWidth'] * hpX, positionData['hpBarYStart'] + 5, x[counter] + positionData['moveWidth'] * hpX - 5, positionData['hpBarYStart'] + 10);
+            this.ctx.lineTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart'] + 10);
+            this.ctx.quadraticCurveTo(x[counter] + positionData['hpBarXMargin'] - 5, positionData['hpBarYStart'] + 5, x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
+            this.ctx.stroke();
+            this.ctx.fill();
+        }
       };
     }
   }
@@ -425,13 +425,13 @@ export default class PokemonBattle {
     } else if (this.player1.move){ // and player 2 switched
       this.messages["Turn " + this.turnCounter.toString()].push(this.player1.name + "'s " + player1Poke.name + ' used ' + Object.keys(this.player1.move)[0] + '!');
       this.calculateDamage(Object.values(this.player1.move)[0], player1Poke, player2Poke);
-      this.checkFaint(player1Poke); // recoil check
-      this.checkFaint(player2Poke);
+      this.checkFaint(player1Poke, this.player1); // recoil check
+      this.checkFaint(player2Poke, this.player2);
     } else if (this.player2.move){ // and player 1 switched
       this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + "'s " + player2Poke.name + ' used ' + Object.keys(this.player2.move)[0] + '!');
       this.calculateDamage(Object.values(this.player2.move)[0], player2Poke, player1Poke);
-      this.checkFaint(player2Poke); // recoil check
-      this.checkFaint(player1Poke);
+      this.checkFaint(player2Poke, this.player2); // recoil check
+      this.checkFaint(player1Poke, this.player1);
     }
   }
 
@@ -457,8 +457,8 @@ export default class PokemonBattle {
       let damagePercent = Math.min(100.0, Math.round(1000 * (damage / defendingPoke.fullHealth)) / 10);
       // display how much damage was taken
       let percentHp = Math.round(1000 * defendingPoke.currentStats['hp'] / defendingPoke.fullHealth) / 10;
-      let printDamage = defendingPoke.currentStats['hp'] > 0 ? damagePercent : percentHp;
       defendingPoke.currentStats['hp'] -= damage;
+      let printDamage = defendingPoke.currentStats['hp'] > 0 ? damagePercent : percentHp;
       this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + defendingPoke.name + " lost " + printDamage.toString() + "% of its health!")
       // calculate recoil
       if (move['recoil']){
