@@ -5,14 +5,26 @@ const positionData = {
     backgroundWidth: 500,
     backgroundHeight: 360,
 
+    instructionXStart: 300,
+    instructionYStart: 0,
+    instructionWidth: 400,
+    instructionHeight: 400,
+    instructionButtonWidth: 100,
+    instructionButtonHeight: 28,
+    xXStart: 320,
+    xXEnd: 340,
+    xYStart: 170,
+    xYEnd: 190,
+
     textXStart: 520,
+    textYStart: 30,
     textWidth: 400,
-    textHeight: 470,
+    textHeight: 440,
 
     turnDisplayX: 30,
     turnDisplayY: 415,
     turnDisplayWidth: 150,
-    turnDisplayHeight: 35,
+    turnDisplayHeight: 30,
 
     // moves area
     moveXStart: 190,

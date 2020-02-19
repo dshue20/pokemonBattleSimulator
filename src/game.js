@@ -14,6 +14,14 @@ export default class PokemonBattle {
     this.player2 = new Player();
     // this.player1 = new Player(prompt("Player 1, please enter your name"));
     // this.player2 = new Player(prompt("Player 2, please enter your name"));
+    // document.addEventListener("click", e => {
+    //   const audio = document.getElementById("music");
+    //   audio.play();
+    // });
+    // this.instructions = false;
+    // while (!this.instructions){
+    //   this.instructionsDisplay();
+    // }
     this.currentPlayer = this.player1;
     this.frameCount = 0;
     this.currentLoopIndex1 = 0;
@@ -22,13 +30,39 @@ export default class PokemonBattle {
     this.yStart = positionData['pokemonYStart'] + positionData['screenY'];
     this.turnCounter = 1;
     this.messages = {"Turn 1": []};
+    this.paused = false;
     this.getAnimationInfo();
     this.background = this.setBackground();
+    this.bindEventHandlers();
     this.drawBackground(this.background);
     this.drawTextbox();
     this.drawPokemon();
     this.drawOptionsDisplay();
-    this.bindEventHandlers();
+  }
+
+  instructionsDisplay(){
+    // drawing the box
+    this.ctx.fillStyle = "black";
+    this.ctx.fillRect(positionData['instructionXStart'], positionData['instructionYStart'], positionData['instructionWidth'], positionData['instructionHeight']);
+    this.ctx.fillStyle = "#FFFBCE";
+    this.ctx.fillRect(positionData['instructionXStart'] + 4, positionData['instructionYStart'] + 4, positionData['instructionWidth'] - 8, positionData['instructionHeight'] - 8);
+    
+    // writing the instructions
+    this.ctx.fillStyle = "black";
+    this.ctx.font = "20px Verdana";
+    this.ctx.fillText("X", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 30);
+    this.ctx.font = "bold 20px Verdana";
+    this.ctx.fillText("Instructions", positionData['instructionXStart'] + 130, positionData['instructionYStart'] + 30);
+    this.ctx.font = "14px Verdana";
+    this.ctx.fillText("This Pokemon Battle Simulator randomly generates", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 60);
+    this.ctx.fillText("two teams of six Pokemon.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 80);
+    this.ctx.fillText("Players will take turns selecting moves with", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 110);
+    this.ctx.fillText("which to attack or other Pokemon to switch in.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 130);
+    this.ctx.fillText("Text commentary is shown on the right side.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 160)
+    this.ctx.fillText("A player is declared the winner once all of his", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 190);
+    this.ctx.fillText("or her opponent's Pokemon have fainted!", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 210);
+    this.ctx.fillText("Press the 'X' on the top left corner to close", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 240);
+    this.ctx.fillText("this instructions pane.", positionData['instructionXStart'] + 15, positionData['instructionYStart'] + 260);
   }
 
   getAnimationInfo(){
@@ -59,9 +93,19 @@ export default class PokemonBattle {
 
   drawTextbox(){
     this.ctx.fillStyle = "black";
-    this.ctx.fillRect(positionData['textXStart'], 0, positionData['textWidth'], positionData['textHeight']);
+
+    // draw instructions button
+    this.ctx.fillRect(positionData['textXStart'], 0, positionData['instructionButtonWidth'], positionData['instructionButtonHeight']);
     this.ctx.fillStyle = "white";
-    this.ctx.fillRect(positionData['textXStart'] + 1, 1, positionData['textWidth'] - 2, positionData['textHeight'] - 2);
+    this.ctx.fillRect(positionData['textXStart'] + 1, 1, positionData['instructionButtonWidth'] - 2, positionData['instructionButtonHeight'] - 2);
+    this.ctx.font = "bold 12px Verdana";
+    this.ctx.fillStyle = "black";
+    this.ctx.fillText("Instructions", positionData['textXStart'] + 8 , 18);
+
+    // draw textbox
+    this.ctx.fillRect(positionData['textXStart'], positionData['textYStart'], positionData['textWidth'], positionData['textHeight']);
+    this.ctx.fillStyle = "white";
+    this.ctx.fillRect(positionData['textXStart'] + 1, positionData['textYStart'] + 1, positionData['textWidth'] - 2, positionData['textHeight'] - 2);
     this.messageDisplay();
   }
 
@@ -73,26 +117,28 @@ export default class PokemonBattle {
     backPokemon.src = this.src2[this.currentLoopIndex2];
 
     backPokemon.onload = () => {
-      // frameCount used for animation
-      this.frameCount++;
-      if (this.frameCount > 1) {
-        // clear battle screen
-        this.ctx.clearRect(0, 0, positionData['backgroundWidth'], positionData['backgroundHeight'] + 10);
-        this.drawBackground(this.background);
-        let pokemon1 = 'front' + this.firstPoke1;
-        let pokemon2 = 'back' + this.firstPoke2;
-        this.ctx.drawImage(frontPokemon, pokemonData[pokemon1]['x'], pokemonData[pokemon1]['y'], pokemonData[pokemon1]['width'], pokemonData[pokemon1]['height']);
-        this.ctx.drawImage(backPokemon, pokemonData[pokemon2]['x'], pokemonData[pokemon2]['y'], pokemonData[pokemon2]['width'], pokemonData[pokemon2]['height']);
-        this.currentLoopIndex2++;
-        // reset animation counters
-        if (this.currentLoopIndex2 >= this.cycleLoop2.length) {
-          this.currentLoopIndex2 = 0;
+      if (!this.paused){
+        // frameCount used for animation
+        this.frameCount++;
+        if (this.frameCount > 1) {
+          // clear battle screen
+          this.ctx.clearRect(0, 0, positionData['backgroundWidth'], positionData['backgroundHeight'] + 10);
+          this.drawBackground(this.background);
+          let pokemon1 = 'front' + this.firstPoke1;
+          let pokemon2 = 'back' + this.firstPoke2;
+          this.ctx.drawImage(frontPokemon, pokemonData[pokemon1]['x'], pokemonData[pokemon1]['y'], pokemonData[pokemon1]['width'], pokemonData[pokemon1]['height']);
+          this.ctx.drawImage(backPokemon, pokemonData[pokemon2]['x'], pokemonData[pokemon2]['y'], pokemonData[pokemon2]['width'], pokemonData[pokemon2]['height']);
+          this.currentLoopIndex2++;
+          // reset animation counters
+          if (this.currentLoopIndex2 >= this.cycleLoop2.length) {
+            this.currentLoopIndex2 = 0;
+          }
+          this.currentLoopIndex1++;
+          if (this.currentLoopIndex1 >= this.cycleLoop1.length) {
+            this.currentLoopIndex1 = 0;
+          }
+          this.frameCount = 0;
         }
-        this.currentLoopIndex1++;
-        if (this.currentLoopIndex1 >= this.cycleLoop1.length) {
-          this.currentLoopIndex1 = 0;
-        }
-        this.frameCount = 0;
       }
       window.requestAnimationFrame(() => this.drawPokemon());
     }
@@ -105,11 +151,11 @@ export default class PokemonBattle {
   }
 
   messageDisplay(){
-    this.ctx.clearRect(positionData['textXStart'] + 2, 2, positionData['textWidth'] - 3, positionData['textHeight'] - 3);
+    this.ctx.clearRect(positionData['textXStart'] + 2, positionData['textYStart'] + 2, positionData['textWidth'] - 3, positionData['textHeight'] - 3);
     while (Object.keys(this.messages).length > 3){
       delete this.messages["Turn " + (this.turnCounter-3).toString()];
     }
-    let y = 30;
+    let y = 30 + positionData['textYStart'];
     this.ctx.fillStyle = "black";
     Object.keys(this.messages).forEach(turn => {
       this.ctx.font = "bold 20px Verdana";
@@ -131,7 +177,6 @@ export default class PokemonBattle {
     this.ctx.fillText(this.currentPlayer === this.player1 ? this.player1.name + "'s" : this.player2.name + "'s", positionData['turnDisplayX'], positionData['turnDisplayY']);
     let turnOrSwitch = this.currentPlayer.party[0].currentStats['hp'] <= 0 ? 'Switch!' : 'Turn!';
     this.ctx.fillText(turnOrSwitch, positionData['turnDisplayX'], positionData['turnDisplayY'] + positionData['turnDisplayHeight']);
-    //debugger;
   }
 
   movesDisplay(){
@@ -174,7 +219,6 @@ export default class PokemonBattle {
       icon.src = "images/icons/" + this.currentPlayer.party[counter].name.toLowerCase() + ".png";
       icon.onload = () => {
           this.ctx.drawImage(icon, positionData['pokemonXMargin'] + 2 + x[counter], y-5);
-          // console.log("icon x: ", positionData['pokemonXMargin'] + 2 + x[counter], "icon y: ", y-5)
           this.ctx.font = "13px Verdana";
           this.ctx.fillStyle = "black";
           if (this.currentPlayer.party[counter].name === "Mrmime"){
@@ -185,9 +229,6 @@ export default class PokemonBattle {
           // draw HP bar
           this.ctx.fillText("HP: ", x[counter] + 20, positionData['hpYStart']);
           let percentHp = this.currentPlayer.party[counter].currentStats['hp'] / (statsAndMovesData[this.currentPlayer.party[counter].name]['hp'] * 2 + 141);
-          console.log(this.currentPlayer.party[counter].name);
-          console.log('percentHP', percentHp);
-          console.log('currentHp', this.currentPlayer.party[counter].currentStats['hp']);
           let hpX;
           if (percentHp > 0 && percentHp < 0.25){
               hpX = 0.45;
@@ -202,7 +243,6 @@ export default class PokemonBattle {
               hpX = 1;
               this.ctx.fillStyle = "green";
           }
-          console.log('hpX', hpX);
           if (percentHp >= 0){
               this.ctx.beginPath();
               this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
@@ -225,6 +265,14 @@ export default class PokemonBattle {
       } // and this is the area with move options
       else if (e.screenX >= positionData['moveXStart'] && e.screenY >= positionData['moveClickY'] && e.screenX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.screenY <= positionData['moveClickY'] + positionData['moveHeight'] * 2 + 10){
           this.moveHandler(e);
+      } else if (e.screenX >= positionData['screenX'] + positionData['textXStart'] && e.screenY >= positionData['screenY'] && e.screenX <= positionData['screenX'] + positionData['textXStart'] + positionData['instructionButtonWidth'] && e.screenY <= positionData['screenY'] + positionData['instructionButtonHeight']){
+        this.paused = true;
+        this.instructionsDisplay();
+      } else if (e.screenX >= positionData['xXStart'] && e.screenY >= positionData['xYStart'] && e.screenX <= positionData['xXEnd'] && e.screenY <= positionData['xYEnd']){
+        this.paused = false;
+        this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
+        this.drawTextbox();
+        this.drawOptionsDisplay();
       };
     })
   }
