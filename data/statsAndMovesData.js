@@ -95,7 +95,7 @@ const statsAndMovesData = {
         hp: 250,
         attack: 5,
         defense: 5,
-        spAtk: 50,
+        spAtk: 20,
         spDef: 105,
         speed: 50,
         moves: {

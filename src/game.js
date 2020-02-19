@@ -168,22 +168,26 @@ export default class PokemonBattle {
 
   messageDisplay(){
     this.ctx.clearRect(positionData['textXStart'] + 2, positionData['textYStart'] + 2, positionData['textWidth'] - 3, positionData['textHeight'] - 3);
-    while (Object.keys(this.messages).length > 3){
-      delete this.messages["Turn " + (this.turnCounter-3).toString()];
-    }
+    // while (Object.keys(this.messages).length > 3){
+    //   delete this.messages["Turn " + (this.turnCounter-3).toString()];
+    // }
     let y = 30 + positionData['textYStart'];
     this.ctx.fillStyle = "black";
     Object.keys(this.messages).forEach(turn => {
       this.ctx.font = "bold 20px Verdana";
-      this.ctx.fillText(turn, positionData['textXStart'] + 20, y);
+      if (y <= 460) this.ctx.fillText(turn, positionData['textXStart'] + 20, y);
       y += 20;
       this.messages[turn].forEach(message => {
         this.ctx.font = "14px Verdana";
-        this.ctx.fillText(message, positionData['textXStart'] + 20, y);
+        if (y <= 460) this.ctx.fillText(message, positionData['textXStart'] + 20, y);
         y += 20;
       })
       y += 10;
     })
+    if (y > 460){
+      delete this.messages[Object.keys(this.messages)[0]];
+      this.messageDisplay();
+    }
   }
 
   turnDisplay(){
@@ -515,7 +519,9 @@ export default class PokemonBattle {
 
   checkFaint(faintPoke, player=null){
     if (faintPoke.currentStats['hp'] <= 0){
-      if (!player) this.messages["Turn " + this.turnCounter.toString()].push(faintPoke.name + " fainted!");
+      let playerName = player ? player.name : this.currentPlayer.name;
+      let message = playerName + "'s " + faintPoke.name + " fainted!";
+      if (!this.messages["Turn " + this.turnCounter.toString()].includes(message)) this.messages["Turn " + this.turnCounter.toString()].push(message);
       this.checkGameOver();
       if (faintPoke === this.player1.party[0]) this.currentPlayer = this.player1;
       if (player){

@@ -21,7 +21,8 @@ export default class Player {
         party.push(new Pokemon(pokemon));
       }
     };
-    party[0] = new Pokemon('Electrode');
+    // party[0] = new Pokemon('Pidgeot');
+    // party[0].currentStats['hp'] = 1;
     return party;
   }
 }
