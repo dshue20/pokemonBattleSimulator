@@ -21,8 +21,7 @@ export default class Player {
         party.push(new Pokemon(pokemon));
       }
     };
-    // party[0] = new Pokemon('Mewtwo');
-    // party[5] = new Pokemon('Magikarp');
+    party[0] = new Pokemon('Electrode');
     return party;
   }
 }

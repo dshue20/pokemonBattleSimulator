@@ -161,7 +161,7 @@ const movesData = {
         category: 'special'
     },
     'Explosion': {
-        power: 250,
+        power: 99999,
         accuracy: 100,
         type: 'normal',
         category: 'physical',

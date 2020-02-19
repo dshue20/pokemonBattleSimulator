@@ -95,7 +95,7 @@ const statsAndMovesData = {
         hp: 250,
         attack: 5,
         defense: 5,
-        spAtk: 5,
+        spAtk: 50,
         spDef: 105,
         speed: 50,
         moves: {
@@ -296,7 +296,7 @@ const statsAndMovesData = {
         moves: {
             'Thunder': movesData['Thunder'],
             'Signal Beam': movesData['Signal Beam'],
-            'Explosion': movesData['Explosion'],
+            'Shadow Ball': movesData['Shadow Ball'],
             'Hidden Power': movesData['Hidden Power Ice']
         },
         types: ['electric']

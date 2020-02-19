@@ -10,8 +10,10 @@ export default class PokemonBattle {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.dimensions = { width: canvas.width, height: canvas.height };
-    this.player1 = new Player();
-    this.player2 = new Player();
+    // this.player1 = new Player();
+    // this.player2 = new Player();
+    this.player1 = new Player(prompt("Player 1, please enter your name"));
+    this.player2 = new Player(prompt("Player 2, please enter your name"));
     this.setAudio();
     this.currentPlayer = this.player1;
     this.frameCount = 0;
@@ -34,8 +36,9 @@ export default class PokemonBattle {
 
   setAudio(){
     this.audio = document.getElementById("music");
-    let audioNum = Math.floor(Math.random() * 17);
-    if (audioNum > 14) audioNum = 12; // i just really like audio source 12
+    let audioNum = Math.floor(Math.random() * 19) + 1;
+    if (audioNum === 16 || audioNum === 17) audioNum = 12; // i just really like audio sources 12 and 15
+    if (audioNum === 18 || audioNum === 19) audioNum = 15;
     this.audio.src = "audio/audio" + audioNum.toString() + ".mp3";
   }
 
@@ -297,6 +300,7 @@ export default class PokemonBattle {
     for (let i=1; i < 6; i++){
       if (e.screenX >=  this.xStart + positionData['pokemonXStart2'] * i && e.screenX <= this.xStart + positionData['pokemonXStart2'] * i + positionData['moveWidth']){
         if (this.currentPlayer.party[i].currentStats['hp'] > 0){
+          this.currentPlayer.party[0].resetStats();
           this.currentPlayer.party.unshift(this.currentPlayer.party.splice(i,1)[0]);
           this.messages["Turn " + this.turnCounter.toString()].push(this.currentPlayer.name + " sent out " + this.currentPlayer.party[0].name + "!");
           // update party order and display again
@@ -304,11 +308,15 @@ export default class PokemonBattle {
           if (!this.currentPlayer.faint){
             this.switchTurn();
           } else {
+            let otherPlayer = this.currentPlayer === this.player1 ? this.player2 : this.player1;
             this.afterPokemonSwitch();
             this.messageDisplay();
-            this.resetTurn();
-            this.currentPlayer = this.player1;
-            this.drawOptionsDisplay();
+            this.currentPlayer.faint = false;
+            if (!this.checkFaint(otherPlayer.party[0], otherPlayer)){
+              this.resetTurn();
+              this.currentPlayer = this.player1;
+              this.drawOptionsDisplay();
+            };
           }
         } else {
           this.drawOptionsDisplay();
@@ -373,7 +381,7 @@ export default class PokemonBattle {
       let slowerPokemon;
       let fasterMove;
       let slowerMove;
-      if (player1Poke.currentStats['speed'] > player2Poke.currentStats['speed']){
+      if (player1Poke.currentStats['speed'] >= player2Poke.currentStats['speed']){
         fasterPokemon = player1Poke;
       } else if (player2Poke.currentStats['speed'] > player1Poke.currentStats['speed']){
         fasterPokemon = player2Poke;
@@ -389,24 +397,36 @@ export default class PokemonBattle {
       } else {
         slowerPokemon = player1Poke;
         fasterMove = this.player2.move;
-        slowerMove = this.player2.move;
+        slowerMove = this.player1.move;
         fasterPlayer = this.player2;
         slowerPlayer = this.player1;
       }
       this.messages["Turn " + this.turnCounter.toString()].push(fasterPlayer.name + "'s " + fasterPokemon.name + ' used ' + Object.keys(fasterMove)[0] + '!');
-      this.calculateDamage(Object.values(fasterMove)[0], fasterPokemon, slowerPokemon);
-      if (!this.checkFaint(slowerPokemon)){
+      if (Object.keys(fasterMove)[0] === 'Splash'){
+        this.messages["Turn " + this.turnCounter.toString()].push("But nothing happened!");
+      } else {
+        this.calculateDamage(Object.values(fasterMove)[0], fasterPokemon, slowerPokemon);
+        this.checkFaint(fasterPokemon); // if recoil
+      }
+      if (!this.checkFaint(slowerPokemon)){ // don't do the move if the pokemon has already fainted
         this.messages["Turn " + this.turnCounter.toString()].push(slowerPlayer.name + "'s " + slowerPokemon.name + ' used ' + Object.keys(slowerMove)[0] + '!');
-        this.calculateDamage(Object.values(slowerMove)[0], slowerPokemon, fasterPokemon);
+        if (Object.keys(slowerMove)[0] === 'Splash'){
+          this.messages["Turn " + this.turnCounter.toString()].push("But nothing happened!");
+        } else {
+          this.calculateDamage(Object.values(slowerMove)[0], slowerPokemon, fasterPokemon);
+        }
+        this.checkFaint(slowerPokemon); // if recoil
         this.checkFaint(fasterPokemon);
       }
-    } else if (this.player1.move){
+    } else if (this.player1.move){ // and player 2 switched
       this.messages["Turn " + this.turnCounter.toString()].push(this.player1.name + "'s " + player1Poke.name + ' used ' + Object.keys(this.player1.move)[0] + '!');
       this.calculateDamage(Object.values(this.player1.move)[0], player1Poke, player2Poke);
+      this.checkFaint(player1Poke); // recoil check
       this.checkFaint(player2Poke);
-    } else if (this.player2.move){
+    } else if (this.player2.move){ // and player 1 switched
       this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + "'s " + player2Poke.name + ' used ' + Object.keys(this.player2.move)[0] + '!');
       this.calculateDamage(Object.values(this.player2.move)[0], player2Poke, player1Poke);
+      this.checkFaint(player2Poke); // recoil check
       this.checkFaint(player1Poke);
     }
   }
@@ -415,7 +435,10 @@ export default class PokemonBattle {
     let attack;
     let defense;
     let stab = 1;
+
+    // damage-dealing moves
     if (move['power'] > 0){
+      // is the attack physical or special?
       if (move['category'] === 'physical'){
         attack = attackingPoke.currentStats['attack'];
         defense = defendingPoke.currentStats['defense'];
@@ -423,21 +446,81 @@ export default class PokemonBattle {
         attack = attackingPoke.currentStats['spAtk'];
         defense = defendingPoke.currentStats['spDef'];
       }
+      // is there stab?
       if (attackingPoke.currentStats['types'].includes(move['type'])) stab = 1.2;
+      // calculate and apply damage
       let damage = (42 * move['power'] * attack / defense / 50 + 2) * stab;
-      let damagePercent = Math.round(1000 * (damage / defendingPoke.fullHealth)) / 10;
+      let damagePercent = Math.min(100.0, Math.round(1000 * (damage / defendingPoke.fullHealth)) / 10);
+      // display how much damage was taken
       let percentHp = Math.round(1000 * defendingPoke.currentStats['hp'] / defendingPoke.fullHealth) / 10;
       let printDamage = defendingPoke.currentStats['hp'] > 0 ? damagePercent : percentHp;
       defendingPoke.currentStats['hp'] -= damage;
       this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + defendingPoke.name + " lost " + printDamage.toString() + "% of its health!")
+      // calculate recoil
+      if (move['recoil']){
+        let recoil;
+        if (move['recoil'] > 0){
+          recoil = move['recoil'] / 100 * damage;
+          let recoilPercent = Math.min(100.0, Math.round(1000 * (recoil / attackingPoke.fullHealth)) / 10);
+          this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " lost " + recoilPercent.toString() + "% of its health!");
+          attackingPoke.currentStats['hp'] -= recoil;
+        } else {
+          recoil = Math.abs(move['recoil']) / 100 * damage;
+          let recoilPercent = Math.min(Math.round(1000 * (attackingPoke.fullHealth - attackingPoke.currentStats['hp']) / 10), Math.round(1000 * (recoil / attackingPoke.fullHealth)) / 10);
+          this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " restored " + recoilPercent.toString() + "% of its health!");
+          attackingPoke.currentStats['hp'] = Math.min(attackingPoke.currentStats['hp'] + recoil, statsAndMovesData[attackingPoke.name]['hp']);
+        }
+      }
+    } 
+
+    // stat-changing moves
+    else {
+      // is it on yourself or the other?
+      let affected = move['self'] ? attackingPoke : defendingPoke;
+      // go thru each stat change
+      move['categories'].forEach((cat, idx) => {
+        if (cat === 'hp'){ // raise hp
+          if (affected.currentStats['hp'] === affected.fullHealth){
+            this.messages["Turn " + this.turnCounter.toString()].push(affected.name + "'s health can't go any higher!");
+          } else {
+            let restoredHp = Math.min(50.0, Math.round(1000 * (affected.fullHealth - affected.currentStats['hp']) / 10));
+            affected.currentStats['hp'] = Math.min(affected.currentStats['hp'] * (1 + move['multipliers'][0]), affected.fullHealth);
+            this.messages["Turn " + this.turnCounter.toString()].push(affected.name + " restored " + restoredHp.toString() + "% of its health!");
+          }
+        } else { // change stats
+          if (affected.statChanges[cat] === 6){ // can't go infinitely high
+            this.messages["Turn " + this.turnCounter.toString()].push(affected.name + "'s " + cat + " can't go any higher!");
+          } else if (affected.statChanges[cat] === -6){ // or infinitely low
+            this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + affected.name + "'s " + cat + " can't go any lower!");
+          } else {
+            affected.statChanges[cat] += move['multipliers'][idx];
+            if (affected.statChanges[cat] > 6){ // same thing here
+              affected.statChanges[cat] = 6;
+            } else if (affected.statChanges[cat] < -6){
+              affected.statChanges[cat] = -6;
+            }
+            let modifier = affected.statChanges[cat] >= 0 ? (2 + affected.statChanges[cat])/2 : 2/(2 + affected.statChanges[cat]);
+            // apply the stat change
+            affected.currentStats[cat] = statsAndMovesData[affected.name][cat] * modifier;
+            if (move['self']){
+              this.messages["Turn " + this.turnCounter.toString()].push(affected.name + "'s " + cat + " rose!");
+            } else {
+              this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + affected.name + "'s " + cat + " fell!");
+            }
+          }
+        }
+      })
     }
   }
 
-  checkFaint(faintPoke){
+  checkFaint(faintPoke, player=null){
     if (faintPoke.currentStats['hp'] <= 0){
-      this.messages["Turn " + this.turnCounter.toString()].push(faintPoke.name + " fainted!");
+      if (!player) this.messages["Turn " + this.turnCounter.toString()].push(faintPoke.name + " fainted!");
       this.checkGameOver();
       if (faintPoke === this.player1.party[0]) this.currentPlayer = this.player1;
+      if (player){
+        this.currentPlayer = player;
+      }
       this.currentPlayer.faint = true;
       this.drawOptionsDisplay();
       return true;
