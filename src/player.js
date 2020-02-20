@@ -21,7 +21,7 @@ export default class Player {
         party.push(new Pokemon(pokemon));
       }
     };
-    party[0] = new Pokemon('Articuno');
+    // party[0] = new Pokemon('Chansey');
     // party[0].currentStats['hp'] = 1;
     // party[1] = new Pokemon('Magikarp');
     // party[1].currentStats['hp'] = 1;

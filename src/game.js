@@ -463,7 +463,7 @@ export default class PokemonBattle {
     let stab = 1;
 
     // damage-dealing moves
-    if (move['power'] > 0){
+    if (move['power'] > 0 || move['power'] === 'level'){
       // is the attack physical or special?
       if (move['category'] === 'physical'){
         attack = attackingPoke.currentStats['attack'];
@@ -477,6 +477,7 @@ export default class PokemonBattle {
       // calculate and apply damage
       let std = (Math.random() * 20 + 90) / 100;
       let damage = (42 * move['power'] * attack / defense / 50 + 2) * stab * std;
+      if (move['power'] === 'level') damage = 100;
       let damagePercent = Math.min(100.0, Math.round(1000 * (damage / defendingPoke.fullHealth)) / 10);
       // display how much damage was taken
       let percentHp = Math.round(1000 * defendingPoke.currentStats['hp'] / defendingPoke.fullHealth) / 10;
