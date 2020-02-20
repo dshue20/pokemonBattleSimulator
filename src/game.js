@@ -12,8 +12,8 @@ export default class PokemonBattle {
     this.dimensions = { width: canvas.width, height: canvas.height };
     // this.player1 = new Player();
     // this.player2 = new Player();
-    this.player1 = new Player(prompt("Player 1, please enter your name"));
-    this.player2 = new Player(prompt("Player 2, please enter your name"));
+    this.player1 = new Player(prompt("Player 1, please enter your name") || "Player 1");
+    this.player2 = new Player(prompt("Player 2, please enter your name") || "Player 2");
     this.setAudio();
     this.currentPlayer = this.player1;
     this.frameCount = 0;
@@ -218,26 +218,40 @@ export default class PokemonBattle {
   switchDisplay(){
     this.ctx.textAlign = "start";
     this.ctx.fillStyle = 'black';
+    this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 6 + positionData['pokemonXMargin'] * 5, positionData['pokemonHeight'] * 3);
     let x = [];
     for (let i = 0; i < 6; i++){
         x.push(positionData['pokemonXStart'] + positionData['pokemonXStart2'] * i);
     };
     for (let counter = 0; counter < 6; counter++){
       const y = positionData['pokemonYStart'];
+      this.ctx.fillStyle = "black";
 
+      this.ctx.fillRect(positionData['pokemonXMargin'] + x[counter], y, positionData['pokemonWidth'], positionData['pokemonHeight']);
+      if (counter === 0){
+          this.ctx.fillStyle = stylingData['selectedPokemon']
+      } else {
+          this.ctx.fillStyle = "white";
+      }
+      this.ctx.fillRect(positionData['pokemonXMargin'] + 1 + x[counter], y+1, positionData['pokemonWidth'] - 2, positionData['pokemonHeight'] - 2);
       // icons are 30x30ish
       let icon = new Image();
       icon.src = "images/icons/" + this.currentPlayer.party[counter].name.toLowerCase() + ".png";
       icon.onload = () => {
-        if (!counter) this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 6 + positionData['pokemonXMargin'] * 5, positionData['pokemonHeight'] * 3);
-        this.ctx.fillStyle = "black";
-        this.ctx.fillRect(positionData['pokemonXMargin'] + x[counter], y, positionData['pokemonWidth'], positionData['pokemonHeight']);
-        if (counter === 0){
-            this.ctx.fillStyle = stylingData['selectedPokemon']
-        } else {
-            this.ctx.fillStyle = "white";
+        if (this.currentPlayer.faint && !counter){
+          this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 6 + positionData['pokemonXMargin'] * 5, positionData['pokemonHeight'] * 3);
+          for (let i=0; i<6; i++){
+            debugger;
+            this.ctx.fillStyle = "black";
+            this.ctx.fillRect(positionData['pokemonXMargin'] + x[i], y, positionData['pokemonWidth'], positionData['pokemonHeight']);
+            if (i === 0){
+                this.ctx.fillStyle = stylingData['selectedPokemon']
+            } else {
+                this.ctx.fillStyle = "white";
+            }
+            this.ctx.fillRect(positionData['pokemonXMargin'] + 1 + x[i], y+1, positionData['pokemonWidth'] - 2, positionData['pokemonHeight'] - 2);
+          }
         }
-        this.ctx.fillRect(positionData['pokemonXMargin'] + 1 + x[counter], y+1, positionData['pokemonWidth'] - 2, positionData['pokemonHeight'] - 2);
         this.ctx.drawImage(icon, positionData['pokemonXMargin'] + 2 + x[counter], y-5);
         this.ctx.font = "13px Verdana";
         this.ctx.fillStyle = "black";
@@ -471,7 +485,11 @@ export default class PokemonBattle {
         } else {
           recoil = Math.abs(move['recoil']) / 100 * damage;
           let recoilPercent = Math.min(Math.round(1000 * (attackingPoke.fullHealth - attackingPoke.currentStats['hp']) / 10), Math.round(1000 * (recoil / attackingPoke.fullHealth)) / 10);
-          this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " restored " + recoilPercent.toString() + "% of its health!");
+          if (!recoilPercent){
+            this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " is at full health!");
+          } else {
+            this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " restored " + recoilPercent.toString() + "% of its health!");
+          }
           attackingPoke.currentStats['hp'] = Math.min(attackingPoke.currentStats['hp'] + recoil, statsAndMovesData[attackingPoke.name]['hp']);
         }
       }
@@ -492,9 +510,9 @@ export default class PokemonBattle {
             this.messages["Turn " + this.turnCounter.toString()].push(affected.name + " restored " + restoredHp.toString() + "% of its health!");
           }
         } else { // change stats
-          if (affected.statChanges[cat] === 6){ // can't go infinitely high
+          if (affected.statChanges[cat] === 6 && move['multipliers'][idx] > 0){ // can't go infinitely high
             this.messages["Turn " + this.turnCounter.toString()].push(affected.name + "'s " + cat + " can't go any higher!");
-          } else if (affected.statChanges[cat] === -6){ // or infinitely low
+          } else if (affected.statChanges[cat] === -6 && move['multipliers'][idx] < 0){ // or infinitely low
             this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + affected.name + "'s " + cat + " can't go any lower!");
           } else {
             affected.statChanges[cat] += move['multipliers'][idx];
@@ -503,13 +521,15 @@ export default class PokemonBattle {
             } else if (affected.statChanges[cat] < -6){
               affected.statChanges[cat] = -6;
             }
-            let modifier = affected.statChanges[cat] >= 0 ? (2 + affected.statChanges[cat])/2 : 2/(2 + affected.statChanges[cat]);
+            let modifier = affected.statChanges[cat] >= 0 ? (2 + affected.statChanges[cat])/2 : 2/(2 - affected.statChanges[cat]);
+            debugger;
             // apply the stat change
             affected.currentStats[cat] = statsAndMovesData[affected.name][cat] * modifier;
+            let direction = move['multipliers'][idx] > 0 ? " rose!" : " fell!"
             if (move['self']){
-              this.messages["Turn " + this.turnCounter.toString()].push(affected.name + "'s " + cat + " rose!");
+              this.messages["Turn " + this.turnCounter.toString()].push(affected.name + "'s " + cat + direction);
             } else {
-              this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + affected.name + "'s " + cat + " fell!");
+              this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + affected.name + "'s " + cat + direction);
             }
           }
         }
