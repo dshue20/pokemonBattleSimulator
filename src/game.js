@@ -467,7 +467,8 @@ export default class PokemonBattle {
       // is there stab?
       if (attackingPoke.currentStats['types'].includes(move['type'])) stab = 1.2;
       // calculate and apply damage
-      let damage = (42 * move['power'] * attack / defense / 50 + 2) * stab;
+      let std = (Math.random() * 20 + 90) / 100;
+      let damage = (42 * move['power'] * attack / defense / 50 + 2) * stab * std;
       let damagePercent = Math.min(100.0, Math.round(1000 * (damage / defendingPoke.fullHealth)) / 10);
       // display how much damage was taken
       let percentHp = Math.round(1000 * defendingPoke.currentStats['hp'] / defendingPoke.fullHealth) / 10;
