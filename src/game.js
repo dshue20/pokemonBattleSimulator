@@ -423,7 +423,7 @@ export default class PokemonBattle {
       if (Object.keys(fasterMove)[0] === 'Splash'){
         this.messages["Turn " + this.turnCounter.toString()].push("But nothing happened!");
       } else {
-        this.calculateDamage(Object.values(fasterMove)[0], fasterPokemon, slowerPokemon);
+        if (!this.checkMiss(Object.values(fasterMove)[0], fasterPokemon)) this.calculateDamage(Object.values(fasterMove)[0], fasterPokemon, slowerPokemon);
         this.checkFaint(fasterPokemon); // if recoil
       }
       if (!this.checkFaint(slowerPokemon)){ // don't do the move if the pokemon has already fainted
@@ -431,22 +431,30 @@ export default class PokemonBattle {
         if (Object.keys(slowerMove)[0] === 'Splash'){
           this.messages["Turn " + this.turnCounter.toString()].push("But nothing happened!");
         } else {
-          this.calculateDamage(Object.values(slowerMove)[0], slowerPokemon, fasterPokemon);
+          if (!this.checkMiss(Object.values(slowerMove)[0], slowerPokemon)) this.calculateDamage(Object.values(slowerMove)[0], slowerPokemon, fasterPokemon);
         }
         this.checkFaint(slowerPokemon); // if recoil
         this.checkFaint(fasterPokemon);
       }
     } else if (this.player1.move){ // and player 2 switched
       this.messages["Turn " + this.turnCounter.toString()].push(this.player1.name + "'s " + player1Poke.name + ' used ' + Object.keys(this.player1.move)[0] + '!');
-      this.calculateDamage(Object.values(this.player1.move)[0], player1Poke, player2Poke);
+      if (!this.checkMiss(Object.values(this.player1.move)[0], player1Poke)) this.calculateDamage(Object.values(this.player1.move)[0], player1Poke, player2Poke);
       this.checkFaint(player1Poke, this.player1); // recoil check
       this.checkFaint(player2Poke, this.player2);
     } else if (this.player2.move){ // and player 1 switched
       this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + "'s " + player2Poke.name + ' used ' + Object.keys(this.player2.move)[0] + '!');
-      this.calculateDamage(Object.values(this.player2.move)[0], player2Poke, player1Poke);
+      if (!this.checkMiss(Object.values(this.player2.move)[0], player2Poke)) this.calculateDamage(Object.values(this.player2.move)[0], player2Poke, player1Poke);
       this.checkFaint(player2Poke, this.player2); // recoil check
       this.checkFaint(player1Poke, this.player1);
     }
+  }
+
+  checkMiss(move, poke){
+    if (Math.random() * 100 > move['accuracy']){
+      this.messages["Turn " + this.turnCounter.toString()].push(poke.name + "'s attack missed!");
+      return true;
+    }
+    return false;
   }
 
   calculateDamage(move, attackingPoke, defendingPoke){
