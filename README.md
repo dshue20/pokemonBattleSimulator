@@ -1,10 +1,13 @@
 # Pokemon Battle Simulator
 This Pokemon Battle Simulator is a browser game implemented using vanilla Javascript and the HTML5 Canvas API.
 
+<img src="images/readme/pokeballs.png" />
+
 ## Instructions
 The Pokemon Battle Simulator randomly generates two teams of six Pokemon. Players take turns either selecting a move with which to attack or a Pokemon to switch in. Text commentary is shown on the right side. Play continues until all of one player's Pokemon have fainted, at which point a winner is declared!
 
 <img src="images/readme/battle.png" />
+<img src="images/readme/battle2.png" />
 
 ## Technical Challenge
 The first challenge in building this game was in animating all of the Pokemon. This problem was solved by downloading GIFs, splitting them into frames, and then looping over each frame by using requestAnimationFrame. Since each Pokemon's animation differed in length, the animation loop also differs for each Pokemon and is reset when a new Pokemon is switched in.
@@ -28,6 +31,8 @@ drawPokemon(){
           this.drawBackground(this.background);
           let pokemon1 = 'front' + this.firstPoke1;
           let pokemon2 = 'back' + this.firstPoke2;
+
+          // positional data is stored in a separate file and referenced here
           this.ctx.drawImage(frontPokemon, pokemonData[pokemon1]['x'], pokemonData[pokemon1]['y'], pokemonData[pokemon1]['width'], pokemonData[pokemon1]['height']);
           this.ctx.drawImage(backPokemon, pokemonData[pokemon2]['x'], pokemonData[pokemon2]['y'], pokemonData[pokemon2]['width'], pokemonData[pokemon2]['height']);
           this.currentLoopIndex2++;
