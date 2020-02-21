@@ -11,10 +11,10 @@ export default class PokemonBattle {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.dimensions = { width: canvas.width, height: canvas.height };
-    this.player1 = new Player();
-    this.player2 = new Player();
-    // this.player1 = new Player(prompt("Player 1, please enter your name") || "Player 1");
-    // this.player2 = new Player(prompt("Player 2, please enter your name") || "Player 2");
+    // this.player1 = new Player();
+    // this.player2 = new Player();
+    this.player1 = new Player(prompt("Player 1, please enter your name") || "Player 1");
+    this.player2 = new Player(prompt("Player 2, please enter your name") || "Player 2");
     this.setAudio();
     this.currentPlayer = this.player1;
     this.frameCount = 0;
@@ -625,7 +625,7 @@ export default class PokemonBattle {
       if (player1Poke.length === 0){
         this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
       } else {
-        this.messages["Turn " + this.turnCounter.toString()].push(this.player2.name + " wins!")
+        this.messages["Turn " + this.turnCounter.toString()].push(this.player1.name + " wins!")
       }
       this.audio.pause();
       this.messageDisplay();
