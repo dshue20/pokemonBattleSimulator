@@ -1,5 +1,5 @@
 # Pokemon Battle Simulator
-This Pokemon Battle Simulator is a browser game implemented using vanilla Javascript and the HTML5 Canvas API.
+This [Pokemon Battle Simulator](https://pokemon-battle-simulator.netlify.com/) is a browser game implemented using vanilla Javascript and the HTML5 Canvas API.
 
 <img src="images/readme/pokeball.png" />
 
