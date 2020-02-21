@@ -1,13 +1,13 @@
 # Pokemon Battle Simulator
 This [Pokemon Battle Simulator](https://pokemon-battle-simulator.netlify.com/) is a browser game implemented using vanilla Javascript and the HTML5 Canvas API.
 
-<img src="images/readme/pokeball.png" />
+<img src="dist/images/readme/pokeball.png" />
 
 ## Instructions
 The Pokemon Battle Simulator randomly generates two teams of six Pokemon. Players take turns either selecting a move with which to attack or a Pokemon to switch in. Text commentary is shown on the right side. Play continues until all of one player's Pokemon have fainted, at which point a winner is declared!
 
-<img src="images/readme/battle.png" />
-<img src="images/readme/battle2.png" />
+<img src="dist/images/readme/battle.png" />
+<img src="dist/images/readme/battle2.png" />
 
 ## Technical Challenge
 The first challenge in building this game was in animating all of the Pokemon. This problem was solved by downloading GIFs, splitting them into frames, and then looping over each frame by using requestAnimationFrame. Since each Pokemon's animation differed in length, the animation loop also differs for each Pokemon and is reset when a new Pokemon is switched in.
