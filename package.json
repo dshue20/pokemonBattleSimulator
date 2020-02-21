@@ -9,7 +9,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js",
+    "start": "webpack --watch --mode=production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
