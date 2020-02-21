@@ -526,7 +526,7 @@ export default class PokemonBattle {
       if (move['recoil']){
         let recoil;
         if (move['recoil'] > 0){
-          recoil = move['recoil'] / 100 * damage;
+          recoil = move['recoil'] * printDamage / 10000 * defendingPoke.fullHealth;
           let recoilPercent = Math.min(Math.round(1000 * attackingPoke.currentStats['hp'] / attackingPoke.fullHealth) / 10, Math.round(1000 * (recoil / attackingPoke.fullHealth)) / 10);
           this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " lost " + recoilPercent.toString() + "% of its health due to recoil!");
           attackingPoke.currentStats['hp'] -= recoil;
@@ -587,7 +587,7 @@ export default class PokemonBattle {
   checkFaint(faintPoke, player=null){
     // check if the pokemon's hp is 0
     if (faintPoke.currentStats['hp'] <= 0){
-      let playerName = player ? player.name : this.currentPlayer.name;
+      let playerName = this.player1.party[0] === faintPoke ? this.player1.name : this.player2.name;
       let message = playerName + "'s " + faintPoke.name + " fainted!";
       if (!this.messages["Turn " + this.turnCounter.toString()].includes(message)) this.messages["Turn " + this.turnCounter.toString()].push(message);
       
