@@ -141,11 +141,13 @@ export default class PokemonBattle {
           // clear battle screen
           this.ctx.clearRect(0, 0, positionData['backgroundWidth'], positionData['backgroundHeight'] + 10);
           this.drawBackground(this.background);
+
           let pokemon1 = 'front' + this.firstPoke1;
           let pokemon2 = 'back' + this.firstPoke2;
           this.ctx.drawImage(frontPokemon, pokemonData[pokemon1]['x'], pokemonData[pokemon1]['y'], pokemonData[pokemon1]['width'], pokemonData[pokemon1]['height']);
           this.ctx.drawImage(backPokemon, pokemonData[pokemon2]['x'], pokemonData[pokemon2]['y'], pokemonData[pokemon2]['width'], pokemonData[pokemon2]['height']);
           this.currentLoopIndex2++;
+          
           // reset animation counters
           if (this.currentLoopIndex2 >= this.cycleLoop2.length) {
             this.currentLoopIndex2 = 0;
@@ -583,16 +585,26 @@ export default class PokemonBattle {
   }
 
   checkFaint(faintPoke, player=null){
+    // check if the pokemon's hp is 0
     if (faintPoke.currentStats['hp'] <= 0){
       let playerName = player ? player.name : this.currentPlayer.name;
       let message = playerName + "'s " + faintPoke.name + " fainted!";
       if (!this.messages["Turn " + this.turnCounter.toString()].includes(message)) this.messages["Turn " + this.turnCounter.toString()].push(message);
+      
+      // if that was the player's last pokemon, the game is over
       this.checkGameOver();
+
       if (faintPoke === this.player1.party[0]) this.currentPlayer = this.player1;
+      
+      // this statement interrupts the turn loop in the case of recoil damage causing a pokemon to faint
       if (player){
         this.currentPlayer = player;
       }
+
+      // this faint flag will prevent the game from advancing to the next turn until a new pokemon is switched in
       this.currentPlayer.faint = true;
+
+      // here the user is able to switch to a different pokemon
       this.drawOptionsDisplay();
       return true;
     }
