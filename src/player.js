@@ -21,10 +21,10 @@ export default class Player {
         party.push(new Pokemon(pokemon));
       }
     };
-    party[0] = new Pokemon('Arcanine');
+    // party[0] = new Pokemon('Arcanine');
     // party[0].currentStats['hp'] = 1;
-    party[1] = new Pokemon('Magikarp');
-    party[1].currentStats['hp'] = 1;
+    // party[1] = new Pokemon('Magikarp');
+    // party[1].currentStats['hp'] = 1;
     return party;
   }
 }
