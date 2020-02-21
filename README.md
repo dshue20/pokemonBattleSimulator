@@ -1,7 +1,7 @@
 # Pokemon Battle Simulator
 This Pokemon Battle Simulator is a browser game implemented using vanilla Javascript and the HTML5 Canvas API.
 
-<img src="images/readme/pokeballs.png" />
+<img src="images/readme/pokeball.png" />
 
 ## Instructions
 The Pokemon Battle Simulator randomly generates two teams of six Pokemon. Players take turns either selecting a move with which to attack or a Pokemon to switch in. Text commentary is shown on the right side. Play continues until all of one player's Pokemon have fainted, at which point a winner is declared!
