@@ -11,10 +11,10 @@ export default class PokemonBattle {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.dimensions = { width: canvas.width, height: canvas.height };
-    // this.player1 = new Player();
-    // this.player2 = new Player();
-    this.player1 = new Player(prompt("Player 1, please enter your name") || "Player 1");
-    this.player2 = new Player(prompt("Player 2, please enter your name") || "Player 2");
+    this.player1 = new Player();
+    this.player2 = new Player();
+    // this.player1 = new Player(prompt("Player 1, please enter your name") || "Player 1");
+    // this.player2 = new Player(prompt("Player 2, please enter your name") || "Player 2");
     this.setAudio();
     this.currentPlayer = this.player1;
     this.frameCount = 0;
@@ -169,9 +169,6 @@ export default class PokemonBattle {
 
   messageDisplay(){
     this.ctx.clearRect(positionData['textXStart'] + 2, positionData['textYStart'] + 2, positionData['textWidth'] - 3, positionData['textHeight'] - 3);
-    // while (Object.keys(this.messages).length > 3){
-    //   delete this.messages["Turn " + (this.turnCounter-3).toString()];
-    // }
     let y = 30 + positionData['textYStart'];
     this.ctx.fillStyle = "black";
     Object.keys(this.messages).forEach(turn => {
@@ -180,7 +177,9 @@ export default class PokemonBattle {
       y += 20;
       this.messages[turn].forEach(message => {
         this.ctx.font = "14px Verdana";
-        if (y <= 460) this.ctx.fillText(message, positionData['textXStart'] + 20, y);
+        if (y <= 460){
+          this.ctx.fillText(message, positionData['textXStart'] + 20, y);
+        }
         y += 20;
       })
       y += 10;
@@ -265,18 +264,19 @@ export default class PokemonBattle {
         let percentHp = this.currentPlayer.party[counter].currentStats['hp'] / (statsAndMovesData[this.currentPlayer.party[counter].name]['hp'] * 2 + 141);
         let hpX;
         if (percentHp > 0 && percentHp < 0.25){
-            hpX = 0.45;
+            // hpX = 0.45;
             this.ctx.fillStyle = "red";
         } else if (percentHp >= 0.25 && percentHp < 0.5){
-            hpX = 0.6;
+            // hpX = 0.6;
             this.ctx.fillStyle = "yellow";
         } else if (percentHp >= 0.5 && percentHp < 0.75){
-            hpX = 0.8;
+            // hpX = 0.8;
             this.ctx.fillStyle = "green";
         } else if (percentHp >= 0.75 && percentHp <= 1){
-            hpX = 1;
+            // hpX = 1;
             this.ctx.fillStyle = "green";
         }
+        hpX = 0.37 + 0.63 * percentHp;
         if (percentHp >= 0){
             this.ctx.beginPath();
             this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
@@ -287,6 +287,10 @@ export default class PokemonBattle {
             this.ctx.stroke();
             this.ctx.fill();
         }
+        this.ctx.fillStyle = "black";
+        let currentHp = Math.round(this.currentPlayer.party[counter].currentStats['hp']);
+        currentHp = currentHp < 0 ? 0 : currentHp;
+        this.ctx.fillText(currentHp.toString() + "/" + this.currentPlayer.party[counter].fullHealth.toString(), x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart'] + 30)
       };
     }
   }
@@ -522,7 +526,7 @@ export default class PokemonBattle {
         if (move['recoil'] > 0){
           recoil = move['recoil'] / 100 * damage;
           let recoilPercent = Math.min(Math.round(1000 * attackingPoke.currentStats['hp'] / attackingPoke.fullHealth) / 10, Math.round(1000 * (recoil / attackingPoke.fullHealth)) / 10);
-          this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " lost " + recoilPercent.toString() + "% of its health!");
+          this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " lost " + recoilPercent.toString() + "% of its health due to recoil!");
           attackingPoke.currentStats['hp'] -= recoil;
         } else {
           recoil = Math.abs(move['recoil']) / 100 * damage;
@@ -532,7 +536,7 @@ export default class PokemonBattle {
           } else {
             this.messages["Turn " + this.turnCounter.toString()].push(attackingPoke.name + " restored " + recoilPercent.toString() + "% of its health!");
           }
-          attackingPoke.currentStats['hp'] = Math.min(attackingPoke.currentStats['hp'] + recoil, statsAndMovesData[attackingPoke.name]['hp']);
+          attackingPoke.currentStats['hp'] = Math.min(attackingPoke.currentStats['hp'] + recoil, attackingPoke.fullHealth);
         }
       }
     } 
