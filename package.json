@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "fs": "0.0.1-security",
-    "gifler": "^0.1.0"
+    "gifler": "^0.1.0",
+    "netlify": "^3.0.0"
   },
   "devDependencies": {},
   "scripts": {
