@@ -30,10 +30,15 @@ export default class PokemonBattle {
     this.background = this.setBackground();
     this.bindEventHandlers();
     this.drawBackground(this.background);
+    this.drawPikachu();
     this.drawTextbox();
     this.drawOptionsDisplay();
     this.instructionsDisplay();
     this.drawPokemon();
+  }
+
+  drawPikachu(){
+    document.getElementById("pikachu").style.display = "inherit";
   }
 
   getYOffset(){
@@ -51,6 +56,7 @@ export default class PokemonBattle {
     if (audioNum === 16 || audioNum === 17) audioNum = 12; // i just really like audio sources 12 and 15
     if (audioNum === 18 || audioNum === 19) audioNum = 15;
     this.audio.src = "audio/audio" + audioNum.toString() + ".mp3";
+    this.audio.pause();
   }
 
   instructionsDisplay(){
