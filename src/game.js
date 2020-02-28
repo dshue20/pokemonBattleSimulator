@@ -25,6 +25,7 @@ export default class PokemonBattle {
     this.turnCounter = 1;
     this.messages = {"Turn 1": []};
     this.paused = true;
+    this.getYOffset();
     this.getAnimationInfo();
     this.background = this.setBackground();
     this.bindEventHandlers();
@@ -33,6 +34,15 @@ export default class PokemonBattle {
     this.drawOptionsDisplay();
     this.instructionsDisplay();
     this.drawPokemon();
+  }
+
+  getYOffset(){
+    const header = document.getElementById("header");
+    const headerStyles = getComputedStyle(header);
+    const topMargin = Number(headerStyles["margin-top"].slice(0, headerStyles["margin-top"].length-2));
+    const height = Number(headerStyles["height"].slice(0, headerStyles["height"].length-2));
+    const bottomMargin = Number(headerStyles["margin-bottom"].slice(0, headerStyles["margin-bottom"].length-2));
+    this.headerY = topMargin + height + bottomMargin;
   }
 
   setAudio(){
@@ -138,7 +148,7 @@ export default class PokemonBattle {
         // frameCount used for animation
         this.frameCount++;
         if (this.frameCount > 1) {
-          // clear battle screen
+          // clear battle page
           this.ctx.clearRect(0, 0, positionData['backgroundWidth'], positionData['backgroundHeight'] + 10);
           this.drawBackground(this.background);
 
@@ -300,16 +310,16 @@ export default class PokemonBattle {
   bindEventHandlers() {
     this.canvas.addEventListener('click', e => {
       // this is the area with switch pokemon options
-      if (e.screenX >= this.xStart && e.screenY >= this.yStart && e.screenX <= this.xStart + positionData['pokemonXStart2'] * 5 + positionData['pokemonWidth'] && e.screenY <= this.yStart + positionData['pokemonHeight']){
+      if (e.pageX >= this.xStart && e.pageY + this.headerY >= this.yStart && e.pageX <= this.xStart + positionData['pokemonXStart2'] * 5 + positionData['pokemonWidth'] && e.pageY + this.headerY <= this.yStart + positionData['pokemonHeight']){
         this.switchHandler(e);
       } // and this is the area with move options
-      else if (e.screenX >= positionData['moveXStart'] && e.screenY >= positionData['moveClickY'] && e.screenX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.screenY <= positionData['moveClickY'] + positionData['moveHeight'] * 2 + 10){
+      else if (e.pageX >= positionData['moveXStart'] && e.pageY + this.headerY >= positionData['moveClickY'] && e.pageX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.pageY + this.headerY <= positionData['moveClickY'] + positionData['moveHeight'] * 2 + 10){
           this.moveHandler(e);
-      } else if (e.screenX >= positionData['screenX'] + positionData['textXStart'] && e.screenY >= positionData['screenY'] && e.screenX <= positionData['screenX'] + positionData['textXStart'] + positionData['instructionButtonWidth'] && e.screenY <= positionData['screenY'] + positionData['instructionButtonHeight']){
+      } else if (e.pageX >= positionData['screenX'] + positionData['textXStart'] && e.pageY + this.headerY >= positionData['screenY'] && e.pageX <= positionData['screenX'] + positionData['textXStart'] + positionData['instructionButtonWidth'] && e.pageY + this.headerY <= positionData['screenY'] + positionData['instructionButtonHeight']){
         this.paused = true;
         this.audio.pause();
         this.instructionsDisplay();
-      } else if (e.screenX >= positionData['xXStart'] && e.screenY >= positionData['xYStart'] && e.screenX <= positionData['xXEnd'] && e.screenY <= positionData['xYEnd']){
+      } else if (e.pageX >= positionData['xXStart'] && e.pageY + this.headerY >= positionData['xYStart'] && e.pageX <= positionData['xXEnd'] && e.pageY + this.headerY <= positionData['xYEnd']){
         this.paused = false;
         this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         this.drawTextbox();
@@ -322,7 +332,7 @@ export default class PokemonBattle {
 
   switchHandler(e){
     for (let i=1; i < 6; i++){
-      if (e.screenX >=  this.xStart + positionData['pokemonXStart2'] * i && e.screenX <= this.xStart + positionData['pokemonXStart2'] * i + positionData['moveWidth']){
+      if (e.pageX >=  this.xStart + positionData['pokemonXStart2'] * i && e.pageX <= this.xStart + positionData['pokemonXStart2'] * i + positionData['moveWidth']){
         if (this.currentPlayer.party[i].currentStats['hp'] > 0){
           this.currentPlayer.party[0].resetStats();
           this.currentPlayer.party.unshift(this.currentPlayer.party.splice(i,1)[0]);
@@ -356,16 +366,16 @@ export default class PokemonBattle {
     // in order of moves: top left, top right, bottom left, bottom right
     let move;
     let moveName;
-    if (e.screenX >= positionData['moveXStart'] && e.screenY >= positionData['moveClickY'] && e.screenX <= positionData['moveXStart'] + positionData['moveWidth'] && e.screenY <= positionData['moveClickY'] + positionData['moveHeight']){
+    if (e.pageX >= positionData['moveXStart'] && e.pageY + this.headerY >= positionData['moveClickY'] && e.pageX <= positionData['moveXStart'] + positionData['moveWidth'] && e.pageY + this.headerY <= positionData['moveClickY'] + positionData['moveHeight']){
       moveName = Object.keys(this.pokemonMoves)[0];  
       move = Object.assign({}, {[moveName]: Object.values(this.pokemonMoves)[0]});
-    } else if (e.screenX >= positionData['moveXStart'] + positionData['moveWidth'] + 10 && e.screenY >= positionData['moveClickY'] && e.screenX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.screenY <= positionData['moveClickY'] + positionData['moveHeight']){
+    } else if (e.pageX >= positionData['moveXStart'] + positionData['moveWidth'] + 10 && e.pageY + this.headerY >= positionData['moveClickY'] && e.pageX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.pageY + this.headerY <= positionData['moveClickY'] + positionData['moveHeight']){
       moveName = Object.keys(this.pokemonMoves)[1];  
       move = Object.assign({}, {[moveName]: Object.values(this.pokemonMoves)[1]});
-    } else if (e.screenX >= positionData['moveXStart'] && e.screenY >= positionData['moveClickY'] + positionData['moveHeight'] + 10 && e.screenX <= positionData['moveXStart'] + positionData['moveWidth'] && e.screenY <= positionData['moveClickY'] + positionData['moveHeight'] + positionData['moveHeight'] * 2 + 10){
+    } else if (e.pageX >= positionData['moveXStart'] && e.pageY + this.headerY >= positionData['moveClickY'] + positionData['moveHeight'] + 10 && e.pageX <= positionData['moveXStart'] + positionData['moveWidth'] && e.pageY + this.headerY <= positionData['moveClickY'] + positionData['moveHeight'] + positionData['moveHeight'] * 2 + 10){
       moveName = Object.keys(this.pokemonMoves)[2];
       move = Object.assign({}, {[moveName]: Object.values(this.pokemonMoves)[2]});
-    } else if (e.screenX >= positionData['moveXStart'] + positionData['moveWidth'] + 10 && e.screenY >= positionData['moveClickY'] + positionData['moveHeight'] + 10 && e.screenX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.screenY <= positionData['moveClickY'] + positionData['moveHeight'] + positionData['moveHeight'] * 2 + 10){
+    } else if (e.pageX >= positionData['moveXStart'] + positionData['moveWidth'] + 10 && e.pageY + this.headerY >= positionData['moveClickY'] + positionData['moveHeight'] + 10 && e.pageX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.pageY + this.headerY <= positionData['moveClickY'] + positionData['moveHeight'] + positionData['moveHeight'] * 2 + 10){
       moveName = Object.keys(this.pokemonMoves)[3];  
       move = Object.assign({}, {[moveName]: Object.values(this.pokemonMoves)[3]});
     };
@@ -420,7 +430,6 @@ export default class PokemonBattle {
       } else {
         fasterPokemon = Math.floor(Math.random() * 2) < 1 ? player1Poke : player2Poke;
       }
-      debugger;
       if (fasterPokemon === player1Poke){
         slowerPokemon = player2Poke;
         fasterMove = this.player1.move;
