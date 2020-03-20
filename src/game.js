@@ -11,29 +11,38 @@ export default class PokemonBattle {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.dimensions = { width: canvas.width, height: canvas.height };
-    // this.player1 = new Player();
-    // this.player2 = new Player();
     this.player1 = new Player(prompt("Player 1, please enter your name") || "Player 1");
     this.player2 = new Player(prompt("Player 2, please enter your name") || "Player 2");
     this.setAudio();
     this.currentPlayer = this.player1;
+
+    // these are used for the animations
     this.frameCount = 0;
     this.currentLoopIndex1 = 0;
     this.currentLoopIndex2 = 0;
+
+    // these are baselines used to indicate where on the canvas the pokemon should be placed
     this.xStart = positionData['pokemonXStart'] + positionData['pokemonXMargin'] + positionData['screenX'];
     this.yStart = positionData['pokemonYStart'] + positionData['screenY'];
+
+    // these are used to display text on the right side of the screen
     this.turnCounter = 1;
     this.messages = {"Turn 1": []};
+
     this.paused = true;
     this.getYOffset();
     this.getAnimationInfo();
     this.background = this.setBackground();
     this.bindEventHandlers();
+
+    // these are used to draw the elements onto the page
     this.drawBackground(this.background);
     this.drawPikachu();
     this.drawTextbox();
     this.drawOptionsDisplay();
     this.instructionsDisplay();
+
+    // this animates the pokemon
     this.drawPokemon();
   }
 
@@ -56,7 +65,7 @@ export default class PokemonBattle {
     if (audioNum === 16 || audioNum === 17) audioNum = 12; // i just really like audio sources 12 and 15
     if (audioNum === 18 || audioNum === 19) audioNum = 15;
     this.audio.src = "audio/audio" + audioNum.toString() + ".mp3";
-    this.audio.pause();
+    this.audio.pause(); // so that audio won't play while the user is reading the instructions
   }
 
   instructionsDisplay(){
