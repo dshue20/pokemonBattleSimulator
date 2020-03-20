@@ -46,6 +46,7 @@ export default class PokemonBattle {
     this.drawPokemon();
   }
 
+  // draws the pikachu in the background
   drawPikachu(){
     document.getElementById("pikachu").style.display = "inherit";
   }
@@ -198,6 +199,8 @@ export default class PokemonBattle {
     this.ctx.clearRect(positionData['textXStart'] + 2, positionData['textYStart'] + 2, positionData['textWidth'] - 3, positionData['textHeight'] - 3);
     let y = 30 + positionData['textYStart'];
     this.ctx.fillStyle = "black";
+
+    // iterate through and display stored messages, offsetting their y coordinate
     Object.keys(this.messages).forEach(turn => {
       this.ctx.font = "bold 20px Verdana";
       if (y <= 460) this.ctx.fillText(turn, positionData['textXStart'] + 20, y);
@@ -212,6 +215,7 @@ export default class PokemonBattle {
       y += 10;
     })
     if (y > 460){
+      // delete the oldest message if the y coordinate is too large
       delete this.messages[Object.keys(this.messages)[0]];
       this.messageDisplay();
     }
