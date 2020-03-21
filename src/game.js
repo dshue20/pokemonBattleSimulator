@@ -364,8 +364,8 @@ export default class PokemonBattle {
     for (let i=1; i < 6; i++){
       if (e.pageX >=  this.xStart + positionData['pokemonXStart2'] * i && e.pageX <= this.xStart + positionData['pokemonXStart2'] * i + positionData['moveWidth']){
         if (this.currentPlayer.party[i].currentStats['hp'] > 0){
-          this.currentPlayer.party[0].resetStats();
-          this.currentPlayer.party.unshift(this.currentPlayer.party.splice(i,1)[0]);
+          this.currentPlayer.party[0].resetStats(); // stat changes are reset when a pokemon switches out
+          this.currentPlayer.party.unshift(this.currentPlayer.party.splice(i,1)[0]); // "switching" moves the new pokemon to the front of a player's party
           this.messages["Turn " + this.turnCounter.toString()].push(this.currentPlayer.name + " sent out " + this.currentPlayer.party[0].name + "!");
           // update party order and display again
           this.currentPlayer.switched = true;
@@ -373,7 +373,7 @@ export default class PokemonBattle {
             this.switchTurn();
           } else {
             let otherPlayer = this.currentPlayer === this.player1 ? this.player2 : this.player1;
-            this.afterPokemonSwitch();
+            this.afterPokemonSwitch(); // refetches animation info
             this.messageDisplay();
             this.currentPlayer.faint = false;
             if (!this.checkFaint(otherPlayer.party[0], otherPlayer)){
@@ -392,6 +392,7 @@ export default class PokemonBattle {
   moveHandler(e){
     // if player needs to switch, don't let them select a move
     if (this.currentPlayer.faint) return;
+
     // find which move was selected
     // in order of moves: top left, top right, bottom left, bottom right
     let move;
@@ -415,7 +416,7 @@ export default class PokemonBattle {
     }
   }
 
-  switchTurn(){
+  switchTurn(){ // makes it the other player's turn
     if (this.currentPlayer === this.player2) this.finishTurn();
     if (!this.currentPlayer.faint){
       this.currentPlayer = this.currentPlayer === this.player1 ? this.player2 : this.player1;
@@ -432,10 +433,6 @@ export default class PokemonBattle {
       this.currentLoopIndex1 = 0;
     }
     this.getAnimationInfo();
-  }
-
-  determineOrder(){
-    
   }
 
   handleMove(){
