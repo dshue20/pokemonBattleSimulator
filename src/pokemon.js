@@ -4,7 +4,7 @@ export default class Pokemon {
     constructor(name){
         this.name = name;
         this.currentStats = Object.assign({}, statsAndMovesData[name]);
-        this.currentStats['hp'] = 141 + 2 * this.currentStats['hp'];
+        this.currentStats['hp'] = 141 + 2 * this.currentStats['hp']; // the hp stat is different than the amount of hp they have
         this.fullHealth = this.currentStats['hp'];
         this.statChanges = {
             attack: 0,
@@ -15,7 +15,7 @@ export default class Pokemon {
         }
     }
 
-    resetStats(){
+    resetStats(){ // stats are reset when a pokemon switches out
         this.statChanges = {
             attack: 0,
             defense: 0,

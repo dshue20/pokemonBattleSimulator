@@ -1,3 +1,4 @@
+// to display move background colors
 const typeColors = {
     normal: "#a8a878",
     rock: "#93802d",

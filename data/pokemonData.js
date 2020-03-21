@@ -1,3 +1,4 @@
+// animation / placement info for all pokemon
 const pokemonData = {
     frontPikachu: {
         animationFrames: 33,

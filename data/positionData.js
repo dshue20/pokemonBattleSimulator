@@ -1,3 +1,4 @@
+// position constants referenced to place buttons and images within game.js
 const positionData = {
     screenX: 10,
     screenY: 160,

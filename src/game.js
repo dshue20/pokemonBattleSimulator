@@ -471,12 +471,15 @@ export default class PokemonBattle {
         slowerPlayer = this.player1;
       }
       this.messages["Turn " + this.turnCounter.toString()].push(fasterPlayer.name + "'s " + fasterPokemon.name + ' used ' + Object.keys(fasterMove)[0] + '!');
+      
+      // splash needs to be hard coded cuz its troll
       if (Object.keys(fasterMove)[0] === 'Splash'){
         this.messages["Turn " + this.turnCounter.toString()].push("But nothing happened!");
       } else {
         if (this.checkEffect(Object.values(fasterMove)[0], slowerPokemon) && !this.checkMiss(Object.values(fasterMove)[0], fasterPokemon)) this.calculateDamage(Object.values(fasterMove)[0], fasterPokemon, slowerPokemon);
         this.checkFaint(fasterPokemon); // if recoil
       }
+
       if (!this.checkFaint(slowerPokemon)){ // don't do the move if the pokemon has already fainted
         this.messages["Turn " + this.turnCounter.toString()].push(slowerPlayer.name + "'s " + slowerPokemon.name + ' used ' + Object.keys(slowerMove)[0] + '!');
         if (Object.keys(slowerMove)[0] === 'Splash'){
@@ -511,7 +514,7 @@ export default class PokemonBattle {
   checkEffect(move, poke){
     let effect = true;
     poke.currentStats['types'].forEach(type => {
-      if (effectivenessData[move['type']][type] === 0){
+      if (effectivenessData[move['type']][type] === 0){ // some types do nothing against other types
         this.messages["Turn " + this.turnCounter.toString()].push("But it had no effect...");
         effect = false;
       }
@@ -539,17 +542,21 @@ export default class PokemonBattle {
       if (attackingPoke.currentStats['types'].includes(move['type'])) stab = 1.2;
       // calculate and apply damage
       let std = (Math.random() * 20 + 90) / 100;
+
       // super effective
       defendingPoke.currentStats['types'].forEach(type => {
         if (effectivenessData[move['type']][type]) effective = effective * effectivenessData[move['type']][type];
       });
+
       let damage = (42 * move['power'] * attack / defense / 50 + 2) * stab * std * effective;
       if (move['power'] === 'level') damage = 100;
       let damagePercent = Math.min(100.0, Math.round(1000 * (damage / defendingPoke.fullHealth)) / 10);
+      
       // display how much damage was taken
       let percentHp = Math.round(1000 * defendingPoke.currentStats['hp'] / defendingPoke.fullHealth) / 10;
       defendingPoke.currentStats['hp'] -= damage;
       let printDamage = defendingPoke.currentStats['hp'] > 0 ? damagePercent : percentHp;
+      
       if (effective > 1){
         this.messages["Turn " + this.turnCounter.toString()].push("It's super effective!");
       } else if (effective < 1 && effective > 0){
@@ -558,6 +565,7 @@ export default class PokemonBattle {
         this.messages["Turn " + this.turnCounter.toString()].push("But it had no effect...")
       }
       this.messages["Turn " + this.turnCounter.toString()].push("The opposing " + defendingPoke.name + " lost " + printDamage.toString() + "% of its health!")
+      
       // calculate recoil
       if (move['recoil']){
         let recoil;
@@ -648,6 +656,7 @@ export default class PokemonBattle {
   }
 
   resetTurn(){
+    // reset all the flags, start the next turn
     this.player1.switched = false;
     this.player2.switched = false;
     this.player1.move = null;
@@ -660,13 +669,14 @@ export default class PokemonBattle {
   }
 
   finishTurn(){
-    this.afterPokemonSwitch();
-    this.handleMove();
-    if (!this.currentPlayer.faint) this.resetTurn();
-    this.messageDisplay();
+    this.afterPokemonSwitch(); // reset animation info
+    this.handleMove(); // handle move logic
+    if (!this.currentPlayer.faint) this.resetTurn(); // start a new turn
+    this.messageDisplay(); // display text
   }
 
   checkGameOver(){
+    // check if a player has no more usable pokemon
     let player1Poke = Object.values(this.player1.party).filter(pokemon => pokemon.currentStats['hp'] > 0);
     let player2Poke = Object.values(this.player2.party).filter(pokemon => pokemon.currentStats['hp'] > 0);
     if (player1Poke.length === 0 || player2Poke.length === 0){

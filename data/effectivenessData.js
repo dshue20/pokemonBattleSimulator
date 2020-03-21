@@ -1,3 +1,4 @@
+// to determine what types are supereffective / not very effective against other types
 const effectivenessData = {
     normal: {
         rock: 0.5,
