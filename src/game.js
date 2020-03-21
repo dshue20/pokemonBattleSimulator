@@ -247,6 +247,7 @@ export default class PokemonBattle {
   }
 
   switchDisplay(){
+    // this displays the icons of the six pokemon
     this.ctx.textAlign = "start";
     this.ctx.fillStyle = 'black';
     this.ctx.clearRect(positionData['pokemonXStart'], positionData['pokemonYStart'], positionData['pokemonWidth'] * 6 + positionData['pokemonXMargin'] * 5, positionData['pokemonHeight'] * 3);
@@ -265,6 +266,7 @@ export default class PokemonBattle {
           this.ctx.fillStyle = "white";
       }
       this.ctx.fillRect(positionData['pokemonXMargin'] + 1 + x[counter], y+1, positionData['pokemonWidth'] - 2, positionData['pokemonHeight'] - 2);
+      
       // icons are 30x30ish
       let icon = new Image();
       icon.src = "images/icons/" + this.currentPlayer.party[counter].name.toLowerCase() + ".png";
@@ -285,11 +287,14 @@ export default class PokemonBattle {
         this.ctx.drawImage(icon, positionData['pokemonXMargin'] + 2 + x[counter], y-5);
         this.ctx.font = "13px Verdana";
         this.ctx.fillStyle = "black";
+
+        // Mr. Mime has to be hard coded cuz it's the only name with a space lol
         if (this.currentPlayer.party[counter].name === "Mrmime"){
             this.ctx.fillText("Mr. Mime", positionData['iconXStart'] + x[counter], positionData['iconYStart'] + y);
         } else {
             this.ctx.fillText(this.currentPlayer.party[counter].name, positionData['iconXStart'] + x[counter], positionData['iconYStart'] + y);
         };
+
         // draw HP bar
         this.ctx.fillText("HP: ", x[counter] + 20, positionData['hpYStart']);
         let percentHp = this.currentPlayer.party[counter].currentStats['hp'] / (statsAndMovesData[this.currentPlayer.party[counter].name]['hp'] * 2 + 141);
@@ -308,6 +313,8 @@ export default class PokemonBattle {
             this.ctx.fillStyle = "green";
         }
         hpX = 0.37 + 0.63 * percentHp;
+
+        // this is the actual hp bar
         if (percentHp >= 0){
             this.ctx.beginPath();
             this.ctx.moveTo(x[counter] + positionData['hpBarXMargin'], positionData['hpBarYStart']);
@@ -318,6 +325,8 @@ export default class PokemonBattle {
             this.ctx.stroke();
             this.ctx.fill();
         }
+
+        // display hp number
         this.ctx.fillStyle = "black";
         let currentHp = Math.round(this.currentPlayer.party[counter].currentStats['hp']);
         currentHp = currentHp < 0 ? 0 : currentHp;
@@ -331,14 +340,16 @@ export default class PokemonBattle {
       // this is the area with switch pokemon options
       if (e.pageX >= this.xStart && e.pageY + this.headerY >= this.yStart && e.pageX <= this.xStart + positionData['pokemonXStart2'] * 5 + positionData['pokemonWidth'] && e.pageY + this.headerY <= this.yStart + positionData['pokemonHeight']){
         this.switchHandler(e);
-      } // and this is the area with move options
+      } // this is the area with move options
       else if (e.pageX >= positionData['moveXStart'] && e.pageY + this.headerY >= positionData['moveClickY'] && e.pageX <= positionData['moveXStart'] + positionData['moveWidth'] * 2 + 10 && e.pageY + this.headerY <= positionData['moveClickY'] + positionData['moveHeight'] * 2 + 10){
           this.moveHandler(e);
-      } else if (e.pageX >= positionData['screenX'] + positionData['textXStart'] && e.pageY + this.headerY >= positionData['screenY'] && e.pageX <= positionData['screenX'] + positionData['textXStart'] + positionData['instructionButtonWidth'] && e.pageY + this.headerY <= positionData['screenY'] + positionData['instructionButtonHeight']){
+      } // the instructions display
+      else if (e.pageX >= positionData['screenX'] + positionData['textXStart'] && e.pageY + this.headerY >= positionData['screenY'] && e.pageX <= positionData['screenX'] + positionData['textXStart'] + positionData['instructionButtonWidth'] && e.pageY + this.headerY <= positionData['screenY'] + positionData['instructionButtonHeight']){
         this.paused = true;
         this.audio.pause();
         this.instructionsDisplay();
-      } else if (e.pageX >= positionData['xXStart'] && e.pageY + this.headerY >= positionData['xYStart'] && e.pageX <= positionData['xXEnd'] && e.pageY + this.headerY <= positionData['xYEnd']){
+      } // the x button on the instructions display
+      else if (e.pageX >= positionData['xXStart'] && e.pageY + this.headerY >= positionData['xYStart'] && e.pageX <= positionData['xXEnd'] && e.pageY + this.headerY <= positionData['xYEnd']){
         this.paused = false;
         this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
         this.drawTextbox();
