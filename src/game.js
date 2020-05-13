@@ -37,7 +37,7 @@ export default class PokemonBattle {
 
     // these are used to draw the elements onto the page
     this.drawBackground(this.background);
-    this.drawPikachu();
+    // this.drawPikachu();
     this.drawTextbox();
     this.drawOptionsDisplay();
     this.instructionsDisplay();

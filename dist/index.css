@@ -1,6 +1,7 @@
 body {
-    background-image: url("./images/background.jpg");
+    background-image: url("./images/pikachu.jpg");
     background-repeat: repeat-x;
+    background-size: 95%;
 }
 
 /* div {
@@ -10,7 +11,7 @@ body {
 img {
     position: absolute;
     z-index: -1;
-    right: -5%;
+    right: 5%;
     bottom: -4%;
     display: none;
 }
@@ -22,6 +23,6 @@ canvas {
 audio {
     position: absolute;
     top: 0%;
-    right: 0%;
+    right: 12%;
     height: 40px;
 }
